@@ -1,0 +1,10 @@
+1 - Backend Server
+.\.venv\Scripts\Activate.ps1
+python -m uvicorn app.main:app --reload --port 8000
+
+2 - Backend Event Worker
+.\.venv\Scripts\Activate.ps1
+python -m app.workers.event_worker
+
+3 - Frontend
+npm run dev

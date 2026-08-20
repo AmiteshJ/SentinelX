@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html.light {
+  color-scheme: light;
+}
+
+body {
+  @apply antialiased;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+/* ---- Glassmorphism primitives ---- */
+
+.glass-panel {
+  @apply backdrop-blur-xl border rounded-2xl;
+  background: rgba(15, 20, 28, 0.55);
+  border-color: rgba(58, 160, 255, 0.14);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+html.light .glass-panel {
+  background: rgba(255, 253, 245, 0.65);
+  border-color: rgba(201, 151, 58, 0.2);
+  box-shadow: 0 8px 32px rgba(120, 100, 40, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.glass-panel-strong {
+  @apply glass-panel;
+  background: rgba(10, 14, 20, 0.75);
+}
+
+html.light .glass-panel-strong {
+  background: rgba(255, 255, 250, 0.85);
+}
+
+/* ---- Backgrounds ---- */
+
+.sx-bg-dark {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(58, 160, 255, 0.08), transparent 60%),
+    radial-gradient(900px 500px at 100% 10%, rgba(95, 194, 255, 0.05), transparent 55%),
+    #05070a;
+}
+
+.sx-bg-light {
+  background:
+    radial-gradient(1200px 600px at 15% -10%, rgba(201, 151, 58, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 100% 10%, rgba(255, 226, 168, 0.25), transparent 55%),
+    #fdfaf2;
+}
+
+/* ---- Reduced motion ---- */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ---- Focus states (accessibility) ---- */
+
+:focus-visible {
+  outline: 2px solid theme("colors.sx-blue");
+  outline-offset: 2px;
+}
