@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState, type ReactNode, type ComponentType, type 
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Database,
-  Boxes,
+  Leaf,
   Zap,
   ShieldCheck,
   Radio,
@@ -41,33 +41,37 @@ const DARK_PALETTE = {
   textMuted: "#64748b",
   surface: "rgba(255,255,255,0.025)",
   surfaceHover: "rgba(255,255,255,0.045)",
-  border: "rgba(255,255,255,0.07)",
-  borderHover: "rgba(58,160,255,0.30)",
+  border: "rgba(255,255,255,0.08)",
+  borderHover: "rgba(58,160,255,0.32)",
   primary: "#3aa0ff",
   primaryGlow: "#5fc2ff",
   hairline: "rgba(255,255,255,0.18)",
-  shadowGlow: "rgba(58,160,255,0.18)",
-  panelShadow: "rgba(0,0,0,0.7)",
+  shadowGlow: "rgba(58,160,255,0.20)",
+  panelShadow: "rgba(0,0,0,0.75)",
   skeleton: "rgba(255,255,255,0.04)",
   eyebrow: "rgba(95,194,255,0.8)",
   live: "#34d399",
   replay: "#a78bfa",
   offlineDot: "#64748b",
   critical: "#f87171",
-  criticalBg: "rgba(239,68,68,0.10)",
-  criticalRing: "rgba(239,68,68,0.20)",
+  criticalBg: "rgba(239,68,68,0.14)",
+  criticalRing: "rgba(239,68,68,0.28)",
   high: "#fb923c",
-  highBg: "rgba(249,115,22,0.10)",
-  highRing: "rgba(249,115,22,0.20)",
+  highBg: "rgba(249,115,22,0.14)",
+  highRing: "rgba(249,115,22,0.28)",
   medium: "#fbbf24",
-  mediumBg: "rgba(245,158,11,0.10)",
-  mediumRing: "rgba(245,158,11,0.20)",
-  low: "#94a3b8",
-  lowBg: "rgba(100,116,139,0.10)",
-  lowRing: "rgba(100,116,139,0.20)",
+  mediumBg: "rgba(245,158,11,0.14)",
+  mediumRing: "rgba(245,158,11,0.28)",
+  low: "#60a5fa",
+  lowBg: "rgba(96,165,250,0.14)",
+  lowRing: "rgba(96,165,250,0.28)",
   errorBg: "rgba(239,68,68,0.10)",
   errorBorder: "rgba(239,68,68,0.30)",
   errorText: "#fca5a5",
+  ringColor: "rgba(58,160,255,0.55)",
+  ringDim: "rgba(148,163,184,0.5)",
+  cometColor: "#a78bfa",
+  cometRing: "rgba(167,139,250,0.5)",
 };
 
 const LIGHT_PALETTE = {
@@ -89,27 +93,31 @@ const LIGHT_PALETTE = {
   primaryGlow: "#A78BFA",
   hairline: "rgba(124,58,237,0.14)",
   shadowGlow: "rgba(124,58,237,0.18)",
-  panelShadow: "rgba(124,58,237,0.10)",
+  panelShadow: "rgba(124,58,237,0.12)",
   skeleton: "rgba(124,58,237,0.05)",
   eyebrow: "#7C3AED",
   live: "#16A34A",
   replay: "#7C3AED",
   offlineDot: "#A1A1AA",
   critical: "#F43F5E",
-  criticalBg: "rgba(244,63,94,0.08)",
-  criticalRing: "rgba(244,63,94,0.18)",
+  criticalBg: "rgba(244,63,94,0.10)",
+  criticalRing: "rgba(244,63,94,0.22)",
   high: "#EA580C",
-  highBg: "rgba(234,88,12,0.08)",
-  highRing: "rgba(234,88,12,0.18)",
+  highBg: "rgba(234,88,12,0.10)",
+  highRing: "rgba(234,88,12,0.22)",
   medium: "#D97706",
-  mediumBg: "rgba(217,119,6,0.08)",
-  mediumRing: "rgba(217,119,6,0.18)",
-  low: "#71717A",
-  lowBg: "rgba(113,113,122,0.08)",
-  lowRing: "rgba(113,113,122,0.18)",
+  mediumBg: "rgba(217,119,6,0.10)",
+  mediumRing: "rgba(217,119,6,0.22)",
+  low: "#7C3AED",
+  lowBg: "rgba(124,58,237,0.10)",
+  lowRing: "rgba(124,58,237,0.22)",
   errorBg: "rgba(244,63,94,0.08)",
   errorBorder: "rgba(244,63,94,0.30)",
   errorText: "#E11D48",
+  ringColor: "rgba(124,58,237,0.40)",
+  ringDim: "rgba(161,161,170,0.55)",
+  cometColor: "#7C3AED",
+  cometRing: "rgba(124,58,237,0.35)",
 };
 
 type Palette = typeof DARK_PALETTE;
@@ -127,6 +135,19 @@ function modeColor(mode: string, palette: Palette): string {
   if (mode === "REPLAY") return palette.replay;
   return palette.offlineDot;
 }
+
+// Fixed (non-random) positions so the decorative art doesn't jump around on
+// every realtime re-render.
+const STAR_FIELD = [
+  { top: "18%", left: "22%", size: 2, o: 0.8 },
+  { top: "30%", left: "70%", size: 2, o: 0.5 },
+  { top: "62%", left: "18%", size: 1.5, o: 0.6 },
+  { top: "75%", left: "62%", size: 2, o: 0.4 },
+  { top: "45%", left: "85%", size: 1.5, o: 0.7 },
+  { top: "12%", left: "55%", size: 1.5, o: 0.5 },
+];
+
+const WAVE_BARS = [4, 8, 5, 12, 7, 14, 6, 10, 5, 8, 4, 11, 6, 9, 4];
 
 // ---------------------------------------------------------------------------
 // Motion variants
@@ -164,16 +185,16 @@ function Panel({
           ? {
             borderColor: palette.borderHover,
             backgroundColor: palette.surfaceHover,
-            boxShadow: `0 8px 40px -8px ${palette.shadowGlow}`,
+            boxShadow: `0 24px 70px -20px ${palette.shadowGlow}`,
           }
           : undefined
       }
       style={{
         backgroundColor: palette.surface,
         borderColor: palette.border,
-        boxShadow: `0 8px 32px -16px ${palette.panelShadow}`,
+        boxShadow: `0 20px 60px -24px ${palette.panelShadow}`,
       }}
-      className={`relative overflow-hidden rounded-2xl border backdrop-blur-xl transition-colors duration-300 ${className}`}
+      className={`relative overflow-hidden rounded-[28px] border backdrop-blur-xl transition-colors duration-300 ${className}`}
     >
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px" style={{ background: `linear-gradient(to right, transparent, ${palette.hairline}, transparent)` }} />
       {children}
@@ -193,7 +214,7 @@ function PanelHeader({
   palette: Palette;
 }) {
   return (
-    <div className="mb-4 flex items-center justify-between">
+    <div className="relative z-10 mb-4 flex items-center justify-between">
       <div className="flex items-center gap-2">
         <Icon size={13} style={{ color: palette.primaryGlow }} />
         <h3 className="text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: palette.textSecondary }}>
@@ -218,7 +239,7 @@ function StatusRow({
 }) {
   return (
     <div
-      className="flex items-center justify-between rounded-xl border px-3 py-2.5 transition-colors duration-200"
+      className="flex items-center justify-between rounded-2xl border px-3.5 py-2.5 transition-colors duration-200"
       style={{ borderColor: palette.border, backgroundColor: "transparent" }}
     >
       <div className="flex items-center gap-2.5">
@@ -267,8 +288,77 @@ function SkeletonGrid({ palette }: { palette: Palette }) {
       {Array.from({ length: 6 }).map((_, i) => (
         <div
           key={i}
-          className={`h-40 animate-pulse rounded-2xl border ${i === 3 || i === 4 ? "lg:col-span-3" : ""}`}
+          className={`h-40 animate-pulse rounded-[28px] border ${i === 3 || i === 4 ? "lg:col-span-3" : ""}`}
           style={{ borderColor: palette.border, backgroundColor: palette.skeleton }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Decorative radar illustration for the Monitoring Mode card: concentric
+ * rings, a glowing center, a faint starfield, and a small waveform — a
+ * static, CSS-only approximation, no image assets required. */
+function RadarArt({ palette }: { palette: Palette }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute left-1/2 top-[42%] -translate-x-1/2 -translate-y-1/2">
+        {[1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+            style={{ width: i * 60, height: i * 60, borderColor: palette.ringColor, opacity: 0.4 - i * 0.07 }}
+          />
+        ))}
+        <div
+          className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+          style={{ backgroundColor: palette.primary, boxShadow: `0 0 18px 5px ${palette.primary}` }}
+        />
+      </div>
+      {STAR_FIELD.map((s, idx) => (
+        <span
+          key={idx}
+          className="absolute rounded-full"
+          style={{ top: s.top, left: s.left, width: s.size, height: s.size, backgroundColor: palette.ringDim, opacity: s.o }}
+        />
+      ))}
+      <div className="absolute bottom-5 left-1/2 flex -translate-x-1/2 items-end gap-[3px]">
+        {WAVE_BARS.map((h, idx) => (
+          <span key={idx} className="w-[2px] rounded-full" style={{ height: h, backgroundColor: palette.primary, opacity: 0.45 }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Decorative comet illustration for the Incident Overview card: concentric
+ * rings tinted violet with a comet trail sweeping through, echoing the
+ * radar motif without duplicating it. */
+function CometArt({ palette }: { palette: Palette }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute right-[8%] top-[45%]">
+        {[1, 2, 3].map((i) => (
+          <div
+            key={i}
+            className="absolute right-0 top-0 -translate-y-1/2 rounded-full border"
+            style={{ width: i * 55, height: i * 55, transform: `translate(30%, -50%)`, borderColor: palette.cometRing, opacity: 0.35 - i * 0.08 }}
+          />
+        ))}
+      </div>
+      <div
+        className="absolute h-px w-44 origin-right"
+        style={{ right: "6%", top: "38%", transform: "rotate(-38deg)", background: `linear-gradient(to left, ${palette.cometColor}, transparent)` }}
+      />
+      <div
+        className="absolute h-2.5 w-2.5 rounded-full"
+        style={{ right: "5%", top: "36%", backgroundColor: palette.cometColor, boxShadow: `0 0 16px 4px ${palette.cometColor}` }}
+      />
+      {STAR_FIELD.map((s, idx) => (
+        <span
+          key={idx}
+          className="absolute rounded-full"
+          style={{ top: s.top, left: s.left, width: s.size, height: s.size, backgroundColor: palette.ringDim, opacity: s.o }}
         />
       ))}
     </div>
@@ -369,37 +459,36 @@ export function Dashboard() {
             {/* System Health */}
             <Panel className="p-5" palette={palette}>
               <PanelHeader icon={Database} title="System Health" palette={palette} />
-              <div className="space-y-2">
+              <div className="relative z-10 space-y-2">
                 <StatusRow ok={data.system_health.postgres} label="POSTGRESQL" icon={Database} palette={palette} />
-                <StatusRow ok={data.system_health.mongodb} label="MONGODB" icon={Boxes} palette={palette} />
+                <StatusRow ok={data.system_health.mongodb} label="MONGODB" icon={Leaf} palette={palette} />
                 <StatusRow ok={data.system_health.redis} label="REDIS" icon={Zap} palette={palette} />
                 <StatusRow ok={data.system_health.detection_engine} label="DETECTION ENGINE" icon={ShieldCheck} palette={palette} />
               </div>
             </Panel>
 
             {/* Monitoring Mode */}
-            <Panel className="p-5" palette={palette}>
+            <Panel className="min-h-[220px] p-5" palette={palette}>
+              <RadarArt palette={palette} />
               <PanelHeader icon={Radio} title="Monitoring Mode" palette={palette} />
-              <div className="flex h-full flex-col justify-between">
+              <div className="relative z-10 flex h-full flex-col justify-between">
                 <div
                   className="inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5"
-                  style={{ borderColor: palette.border, boxShadow: `0 0 16px 1px ${currentModeColor}33` }}
+                  style={{ borderColor: palette.border, backgroundColor: palette.surface, boxShadow: `0 0 16px 1px ${currentModeColor}33` }}
                 >
                   <span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: currentModeColor }} />
                   <span className="font-mono text-[11px] font-medium tracking-wide" style={{ color: currentModeColor }}>
                     {MODE_LABEL[data.monitoring_mode] ?? "OFFLINE"}
                   </span>
                 </div>
-                <p className="mt-4 text-xs leading-relaxed" style={{ color: palette.textMuted }}>
-                  No agent connected yet. Live monitoring requires explicit consent — see Settings.
-                </p>
               </div>
             </Panel>
 
             {/* Active Incidents — hero stat */}
-            <Panel className="p-5" palette={palette}>
+            <Panel className="min-h-[220px] p-5" palette={palette}>
+              <CometArt palette={palette} />
               <PanelHeader icon={ShieldAlert} title="Incident Overview" palette={palette} />
-              <div className="flex items-baseline gap-2">
+              <div className="relative z-10 flex items-baseline gap-2">
                 <AnimatedNumber
                   value={data.active_incidents}
                   className="font-mono text-4xl font-semibold tabular-nums"
@@ -412,7 +501,7 @@ export function Dashboard() {
             {/* Threat Overview */}
             <Panel className="p-5 lg:col-span-3" glowOnHover={false} palette={palette}>
               <PanelHeader icon={AlertTriangle} title="Threat Overview" palette={palette} />
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {(
                   [
                     ["critical", data.critical_alerts, AlertOctagon, palette.critical, palette.criticalBg, palette.criticalRing],
@@ -423,10 +512,15 @@ export function Dashboard() {
                 ).map(([severity, count, SevIcon, color, bg, ring]) => (
                   <div
                     key={severity}
-                    className="flex items-center gap-3 rounded-xl border px-4 py-3"
-                    style={{ backgroundColor: bg, borderColor: ring }}
+                    className="relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3.5"
+                    style={{ borderColor: ring, background: `linear-gradient(135deg, ${bg} 0%, transparent 70%)` }}
                   >
-                    <SevIcon size={18} style={{ color }} />
+                    <span
+                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border"
+                      style={{ borderColor: ring, backgroundColor: bg }}
+                    >
+                      <SevIcon size={18} style={{ color }} />
+                    </span>
                     <div>
                       <AnimatedNumber value={count} className="block font-mono text-xl font-semibold tabular-nums" color={color} />
                       <span className="text-[10px] uppercase tracking-wide" style={{ color: palette.textMuted }}>{severity}</span>
@@ -453,12 +547,12 @@ export function Dashboard() {
                 }
               />
               {updates.length === 0 ? (
-                <p className="text-xs leading-relaxed" style={{ color: palette.textMuted }}>
+                <p className="relative z-10 text-xs leading-relaxed" style={{ color: palette.textMuted }}>
                   No alerts yet. This feed populates in real time via WebSocket as soon as the
                   event worker detects something — try a dataset upload or the ingestion API.
                 </p>
               ) : (
-                <ul className="max-h-56 space-y-1.5 overflow-y-auto pr-1">
+                <ul className="relative z-10 max-h-56 space-y-1.5 overflow-y-auto pr-1">
                   <AnimatePresence initial={false}>
                     {updates.map((u, idx) => (
                       <motion.li

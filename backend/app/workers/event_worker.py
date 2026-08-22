@@ -21,6 +21,7 @@ from datetime import datetime, timezone
 
 import structlog
 
+import app.models  # noqa: F401 - ensures all SQLAlchemy tables are registered
 from app.db.mongodb import close_mongo, connect_mongo, get_mongo_db
 from app.db.postgres import AsyncSessionLocal
 from app.db.redis_client import (

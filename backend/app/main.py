@@ -11,6 +11,8 @@ import structlog
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+import app.models  # noqa: F401
+
 from app.api.v1 import (
     ai_assistant,
     alerts,
