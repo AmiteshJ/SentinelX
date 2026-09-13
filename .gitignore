@@ -96,3 +96,17 @@ desktop.ini
 *.tmp
 *.temp
 *.bak
+
+# ==========================================
+# LEGACY UNUSED FILES
+# ==========================================
+
+System Run Guide.txt
+command.txt
+detection_engine/
+live_demo/
+documentation/
+research paper/
+dataset/*.csv
+dataset/*.zip
+dataset/*.gz

@@ -47,6 +47,8 @@ async def run_comparison_experiment(
                 from ml.cnn.train import train_and_evaluate as run
             elif model_name == "lstm":
                 from ml.lstm.train import train_and_evaluate as run
+            elif model_name == "graphsage":
+                continue  # Handled below
             else:
                 results.append({"model": model_name, "error": f"Unknown model '{model_name}'"})
                 continue

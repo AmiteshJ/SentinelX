@@ -1,75 +1,58 @@
 """
-Graph construction for GraphSAGE (spec §12/§14). Builds a host-communication
-graph from real flow records: nodes are IP addresses, edges are observed
-connections, edge/node features come from the same flow features used by the
-other models (so the comparison is fair), and node labels are derived from
-whether that IP was ever the source of a labeled-attack flow.
-
-This is a documented, reasonable construction choice — not the only valid
-one — and is called out as configurable per spec §12 ("graph construction
-must be documented and configurable").
+Graph construction for GraphSAGE (spec §12/§14). Builds a k-NN graph from
+the feature matrix so that each network flow becomes a node and edges connect
+flows with similar features. This approach works with any tabular dataset
+(no IP columns required) and is the same method used in the original
+zero_day_module.
 """
-from dataclasses import dataclass
 
 import numpy as np
-import pandas as pd
 import torch
+from sklearn.neighbors import NearestNeighbors
 from torch_geometric.data import Data
 
+K_NEIGHBORS = 5
 
-@dataclass
-class GraphBuildConfig:
-    source_ip_col: str = "source_ip"
-    destination_ip_col: str = "destination_ip"
-    label_col: str = "label"
-    benign_label: str = "BENIGN"
-    feature_cols: tuple[str, ...] = ("destination_port", "duration_ms", "bytes_sent", "bytes_received")
+def build_knn_graph(X: np.ndarray, y: np.ndarray, k: int = K_NEIGHBORS) -> Data:
+    print(f"  Building {k}-NN graph for {X.shape[0]:,} nodes …")
 
+    nn = NearestNeighbors(n_neighbors=k, algorithm="auto", n_jobs=-1)
+    nn.fit(X)
+    distances, indices = nn.kneighbors(X)
 
-def build_graph(df: pd.DataFrame, config: GraphBuildConfig = GraphBuildConfig()) -> tuple[Data, list[str], dict]:
-    """
-    Returns:
-      - a PyG Data object (x, edge_index, y)
-      - the ordered list of node IPs (index -> ip)
-      - a dict with construction metadata for experiment logging
-    """
-    df = df.dropna(subset=[config.source_ip_col])
-    nodes = pd.unique(pd.concat([df[config.source_ip_col], df.get(config.destination_ip_col, pd.Series(dtype=str))]).dropna())
-    node_index = {ip: i for i, ip in enumerate(nodes)}
+    src, dst = [], []
+    for node_idx in range(X.shape[0]):
+        for neighbour_idx in indices[node_idx]:
+            if node_idx != neighbour_idx:
+                src.append(node_idx)
+                dst.append(neighbour_idx)
+                src.append(neighbour_idx)
+                dst.append(node_idx)
 
-    # Node features: mean of each flow feature over flows where this IP was the source.
-    available_features = [c for c in config.feature_cols if c in df.columns]
-    if not available_features:
-        raise ValueError("No recognized feature columns available for graph node features.")
+    edge_index = torch.tensor([src, dst], dtype=torch.long)
+    edge_index = torch.unique(edge_index, dim=1)
 
-    grouped = df.groupby(config.source_ip_col)[available_features].mean().reindex(nodes).fillna(0.0)
-    x = torch.tensor(grouped.to_numpy(dtype=float), dtype=torch.float)
+    x = torch.tensor(X, dtype=torch.float)
+    y_tensor = torch.tensor(y, dtype=torch.long)
 
-    # Node label: 1 if this IP was ever the source of a non-benign flow, else 0.
-    if config.label_col in df.columns:
-        malicious_sources = set(df.loc[df[config.label_col].astype(str) != config.benign_label, config.source_ip_col])
-        y = torch.tensor([1 if ip in malicious_sources else 0 for ip in nodes], dtype=torch.long)
-    else:
-        y = torch.zeros(len(nodes), dtype=torch.long)
+    data = Data(x=x, edge_index=edge_index, y=y_tensor)
+    return data
 
-    # Edges: source_ip -> destination_ip for every flow where both are known nodes.
-    edge_pairs = []
-    if config.destination_ip_col in df.columns:
-        for src, dst in zip(df[config.source_ip_col], df[config.destination_ip_col]):
-            if pd.isna(dst) or dst not in node_index:
-                continue
-            edge_pairs.append((node_index[src], node_index[dst]))
+def create_graph_data(X_train, X_test, y_train, y_test):
+    X_all = np.vstack([X_train, X_test])
+    y_all = np.concatenate([y_train, y_test])
 
-    if edge_pairs:
-        edge_index = torch.tensor(edge_pairs, dtype=torch.long).t().contiguous()
-    else:
-        edge_index = torch.empty((2, 0), dtype=torch.long)
+    data = build_knn_graph(X_all, y_all)
 
-    data = Data(x=x, edge_index=edge_index, y=y)
-    metadata = {
-        "n_nodes": len(nodes),
-        "n_edges": edge_index.shape[1],
-        "feature_columns": available_features,
-        "label_source": "node is malicious if it ever appears as source_ip of a non-benign flow",
-    }
-    return data, list(nodes), metadata
+    n_train = X_train.shape[0]
+    n_total = X_all.shape[0]
+
+    train_mask = torch.zeros(n_total, dtype=torch.bool)
+    test_mask = torch.zeros(n_total, dtype=torch.bool)
+    train_mask[:n_train] = True
+    test_mask[n_train:] = True
+
+    data.train_mask = train_mask
+    data.test_mask = test_mask
+
+    return data
