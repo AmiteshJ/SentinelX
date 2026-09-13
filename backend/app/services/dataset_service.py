@@ -34,7 +34,18 @@ _COLUMN_ALIASES: dict[str, list[str]] = {
 
 def _normalize_headers(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
+    # Strip and lowercase all columns first
     df.columns = [str(c).strip().lower() for c in df.columns]
+    
+    # Map known aliases directly to canonical ML column names
+    rename_map = {}
+    for canonical, aliases in _COLUMN_ALIASES.items():
+        for col in df.columns:
+            if col in aliases and col != canonical:
+                rename_map[col] = canonical
+    
+    if rename_map:
+        df = df.rename(columns=rename_map)
     return df
 
 
@@ -42,6 +53,8 @@ def _resolve_column(df_columns: list[str], canonical: str) -> str | None:
     for alias in _COLUMN_ALIASES.get(canonical, []):
         if alias in df_columns:
             return alias
+    if canonical in df_columns:
+        return canonical
     return None
 
 
@@ -53,6 +66,12 @@ def clean_dataframe(df: pd.DataFrame) -> pd.DataFrame:
     """Missing-value handling + duplicate removal (spec §4)."""
     df = df.dropna(how="all")
     df = df.drop_duplicates()
+    
+    # Cap at 50,000 rows to prevent ML models from hanging on 1M+ row datasets
+    if len(df) > 50000:
+        print(f"Dataset has {len(df)} rows. Sampling 50,000 to prevent training timeout...")
+        df = df.sample(n=50000, random_state=42)
+        
     return df
 
 

@@ -13,7 +13,7 @@ from app.services.ml_service import run_comparison_experiment
 
 router = APIRouter(prefix="/api/experiments", tags=["experiments"])
 
-AVAILABLE_MODELS = ["random_forest", "xgboost", "cnn", "lstm", "graphsage"]
+AVAILABLE_MODELS = ["graphsage"]
 
 
 @router.post("/run")

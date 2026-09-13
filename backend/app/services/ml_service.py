@@ -14,8 +14,8 @@ import pandas as pd
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
 # ml/ lives at the repo root, one level above backend/
-sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "ml"))
-sys.path.insert(0, str(Path(__file__).resolve().parents[4]))  # so `import ml.xxx` also works
+sys.path.insert(0, str(Path(__file__).resolve().parents[3] / "ml"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[3]))  # so `import ml.xxx` also works
 
 
 async def run_comparison_experiment(
@@ -79,4 +79,5 @@ async def run_comparison_experiment(
     }
     insert_result = await mongo_db.ml_experiments.insert_one(experiment_doc)
     experiment_doc["id"] = str(insert_result.inserted_id)
+    experiment_doc.pop("_id", None)
     return experiment_doc
