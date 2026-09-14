@@ -16,7 +16,7 @@ K_NEIGHBORS = 5
 def build_knn_graph(X: np.ndarray, y: np.ndarray, k: int = K_NEIGHBORS) -> Data:
     print(f"  Building {k}-NN graph for {X.shape[0]:,} nodes …")
 
-    nn = NearestNeighbors(n_neighbors=k, algorithm="auto", n_jobs=-1)
+    nn = NearestNeighbors(n_neighbors=k, algorithm="auto")
     nn.fit(X)
     distances, indices = nn.kneighbors(X)
 

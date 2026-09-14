@@ -18,6 +18,8 @@ def train_and_evaluate(data: PreparedDataset, *, random_state: int = 42) -> dict
     model.fit(data.X_train, data.y_train)
 
     y_pred = model.predict(data.X_test)
+    if hasattr(y_pred, "ndim") and y_pred.ndim > 1:
+        y_pred = y_pred.argmax(axis=1)
     y_proba = model.predict_proba(data.X_test)
 
     result = evaluate(data.y_test, y_pred, y_proba)
