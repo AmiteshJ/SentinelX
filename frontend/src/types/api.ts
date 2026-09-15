@@ -16,6 +16,25 @@ export interface DashboardOverview {
   events_per_second: number;
 }
 
+export interface DatasetFile {
+  filename: string;
+  size_bytes: number;
+  size_formatted: string;
+  categories: string[];
+}
+
+export interface DatasetStreamStatus {
+  is_running: boolean;
+  is_paused: boolean;
+  current_filename: string | null;
+  events_ingested: number;
+  speed_eps: number;
+  loop: boolean;
+  total_rows_estimate: number;
+  current_label: string | null;
+  active_mode: "OFFLINE" | "DATASET" | "LIVE";
+}
+
 export interface UserOut {
   id: string;
   full_name: string;

@@ -7,15 +7,96 @@ presents it as live.
 """
 import json
 
+from pydantic import BaseModel
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 
 from app.api.deps import require_role
 from app.db.redis_client import EVENTS_STREAM, MODE_KEY, get_redis
 from app.services.dataset_service import DatasetValidationError, clean_dataframe, load_csv, to_events
+from app.services.dataset_streamer import DatasetStreamer
 
 router = APIRouter(prefix="/api/datasets", tags=["datasets"])
 
 MAX_ROWS_PER_UPLOAD = 5000  # ingested via Redis Streams in one request; larger files should be chunked client-side
+
+
+class StreamStartRequest(BaseModel):
+    filename: str
+    speed_eps: int = 10
+    loop: bool = True
+
+
+class StreamSpeedRequest(BaseModel):
+    speed_eps: int
+
+
+@router.get("/files")
+async def list_available_files(
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    files = streamer.list_dataset_files()
+    return {"files": files}
+
+
+@router.get("/stream/status")
+async def get_stream_status(
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    return streamer.get_status()
+
+
+@router.post("/stream/start")
+async def start_stream(
+    payload: StreamStartRequest,
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    try:
+        status_info = await streamer.start(
+            filename=payload.filename,
+            speed_eps=payload.speed_eps,
+            loop=payload.loop,
+        )
+        return status_info
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+
+
+@router.post("/stream/pause")
+async def pause_stream(
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    return await streamer.pause()
+
+
+@router.post("/stream/resume")
+async def resume_stream(
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    return await streamer.resume()
+
+
+@router.post("/stream/stop")
+async def stop_stream(
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    return await streamer.stop()
+
+
+@router.post("/stream/speed")
+async def set_stream_speed(
+    payload: StreamSpeedRequest,
+    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    streamer = DatasetStreamer.get_instance()
+    return await streamer.set_speed(payload.speed_eps)
 
 
 @router.post("/upload")

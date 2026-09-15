@@ -1,3 +1,4 @@
+import { useEffect, type JSX } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "./theme/ThemeProvider";
 import { Home } from "./pages/Home";
@@ -16,7 +17,8 @@ import { Settings } from "./pages/Settings";
 import { AuditLogs } from "./pages/AuditLogs";
 import { ComingSoon } from "./pages/ComingSoon";
 import { useAuthStore } from "./store/authStore";
-import type { JSX } from "react";
+import { FloatingIngestionBubble } from "./components/layout/FloatingIngestionBubble";
+import { startGlobalStreamPolling, stopGlobalStreamPolling } from "./store/streamStore";
 
 function RequireAuth({ children }: { children: JSX.Element }) {
   const accessToken = useAuthStore((s) => s.accessToken);
@@ -24,6 +26,16 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 }
 
 export default function App() {
+  const accessToken = useAuthStore((s) => s.accessToken);
+
+  useEffect(() => {
+    if (accessToken) {
+      startGlobalStreamPolling();
+    } else {
+      stopGlobalStreamPolling();
+    }
+  }, [accessToken]);
+
   return (
     <ThemeProvider>
       <Routes>
@@ -48,6 +60,7 @@ export default function App() {
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <FloatingIngestionBubble />
     </ThemeProvider>
   );
 }

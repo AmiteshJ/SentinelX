@@ -7,6 +7,7 @@ alert/incident counters are honest zeros because no ingestion or detection
 pipeline exists yet (those arrive in Phase 4 and Phase 6+). This endpoint
 must NOT be modified to return fabricated numbers to make the UI "look busy".
 """
+import asyncio
 from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,42 +23,69 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 @router.get("/overview", response_model=DashboardOverview)
 async def overview(db: AsyncSession = Depends(get_db), user=Depends(get_current_user)):
-    postgres_ok = await check_postgres_health()
-    mongo_ok = await check_mongo_health()
-    redis_ok = await check_redis_health()
+    # Run DB health checks concurrently
+    postgres_ok, mongo_ok, redis_ok = await asyncio.gather(
+        check_postgres_health(),
+        check_mongo_health(),
+        check_redis_health(),
+        return_exceptions=True,
+    )
+    postgres_ok = bool(postgres_ok) if not isinstance(postgres_ok, Exception) else False
+    mongo_ok = bool(mongo_ok) if not isinstance(mongo_ok, Exception) else False
+    redis_ok = bool(redis_ok) if not isinstance(redis_ok, Exception) else False
 
-    active_incidents_count = 0
-    if postgres_ok:
+    async def fetch_incidents():
+        if not postgres_ok:
+            return 0
         try:
             result = await db.execute(text("SELECT count(*) FROM incidents WHERE status != 'closed'"))
-            active_incidents_count = result.scalar_one() or 0
+            return result.scalar_one() or 0
         except Exception:
-            active_incidents_count = 0
+            return 0
 
-    severity_counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
-    if mongo_ok:
+    async def fetch_severity_counts():
+        counts = {"critical": 0, "high": 0, "medium": 0, "low": 0}
+        if not mongo_ok:
+            return counts
         try:
             mongo_db = get_mongo_db()
-            for severity in severity_counts:
-                severity_counts[severity] = await mongo_db.alerts.count_documents(
-                    {"severity": severity, "status": "open"}
+            results = await asyncio.gather(*[
+                mongo_db.alerts.count_documents({"severity": s, "status": "open"})
+                for s in ["critical", "high", "medium", "low"]
+            ], return_exceptions=True)
+            for idx, s in enumerate(["critical", "high", "medium", "low"]):
+                val = results[idx]
+                counts[s] = int(val) if isinstance(val, (int, float)) else 0
+            return counts
+        except Exception:
+            return counts
+
+    async def fetch_redis_info():
+        mode = "OFFLINE"
+        hb = False
+        if redis_ok:
+            try:
+                redis = get_redis()
+                m, h = await asyncio.gather(
+                    redis.get(MODE_KEY),
+                    redis.get("sentinelx:worker:heartbeat"),
+                    return_exceptions=True,
                 )
-        except Exception:
-            pass  # leave honest zeros rather than fail the whole overview
+                mode = m if isinstance(m, str) else "OFFLINE"
+                hb = bool(h) if not isinstance(h, Exception) else False
+            except Exception:
+                pass
+        return mode, hb
 
-    monitoring_mode = "OFFLINE"
-    if redis_ok:
-        try:
-            redis = get_redis()
-            monitoring_mode = await redis.get(MODE_KEY) or "OFFLINE"
-        except Exception:
-            monitoring_mode = "OFFLINE"
+    incidents_task, counts_task, redis_task = await asyncio.gather(
+        fetch_incidents(),
+        fetch_severity_counts(),
+        fetch_redis_info(),
+    )
 
-    # A rule engine exists (app/detection/rule_engine.py) and runs inside the
-    # event worker process, which is a separate container — the API can't see
-    # its liveness directly yet, so this stays false until a worker
-    # heartbeat/health-check is added (tracked in docs/architecture.md).
-    detection_engine_reporting = False
+    active_incidents_count = incidents_task
+    severity_counts = counts_task
+    monitoring_mode, detection_engine_reporting = redis_task
 
     return DashboardOverview(
         system_health=SystemHealth(
