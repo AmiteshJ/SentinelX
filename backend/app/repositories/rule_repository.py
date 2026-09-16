@@ -6,7 +6,7 @@ from app.models.detection import DetectionRule
 
 
 async def load_enabled_rules(db: AsyncSession) -> list[CompiledRule]:
-    result = await db.execute(select(DetectionRule).where(DetectionRule.enabled.is_(True)))
+    result = await db.execute(select(DetectionRule).where(DetectionRule.status == "active"))
     rows = result.scalars().all()
     return [
         CompiledRule(

@@ -7,6 +7,8 @@ import { Register } from "./pages/Register";
 import { VerifyOtp } from "./pages/VerifyOtp";
 import { Dashboard } from "./pages/Dashboard";
 import { SecurityOperations } from "./pages/SecurityOperations";
+import { ThreatHunting } from "./pages/ThreatHunting";
+import { DetectionEngineering } from "./pages/DetectionEngineering";
 import { ThreatIntelligence } from "./pages/ThreatIntelligence";
 import { AiAssistant } from "./pages/AiAssistant";
 import { ZeroDayDetection } from "./pages/ZeroDayDetection";
@@ -18,6 +20,7 @@ import { AuditLogs } from "./pages/AuditLogs";
 import { ComingSoon } from "./pages/ComingSoon";
 import { useAuthStore } from "./store/authStore";
 import { FloatingIngestionBubble } from "./components/layout/FloatingIngestionBubble";
+import { PermissionConsentModal } from "./components/permissions/PermissionConsentModal";
 import { startGlobalStreamPolling, stopGlobalStreamPolling } from "./store/streamStore";
 
 function RequireAuth({ children }: { children: JSX.Element }) {
@@ -47,7 +50,8 @@ export default function App() {
         <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
 
         <Route path="/security-operations" element={<RequireAuth><SecurityOperations /></RequireAuth>} />
-        <Route path="/threat-detection" element={<RequireAuth><ComingSoon title="Threat Detection" phase="rule engine + Isolation Forest run server-side; a dedicated management UI is pending" /></RequireAuth>} />
+        <Route path="/hunting" element={<RequireAuth><ThreatHunting /></RequireAuth>} />
+        <Route path="/detection" element={<RequireAuth><DetectionEngineering /></RequireAuth>} />
         <Route path="/zero-day" element={<RequireAuth><ZeroDayDetection /></RequireAuth>} />
         <Route path="/threat-intelligence" element={<RequireAuth><ThreatIntelligence /></RequireAuth>} />
         <Route path="/investigation" element={<RequireAuth><Investigation /></RequireAuth>} />
@@ -61,6 +65,7 @@ export default function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
       <FloatingIngestionBubble />
+      {accessToken && <PermissionConsentModal />}
     </ThemeProvider>
   );
 }

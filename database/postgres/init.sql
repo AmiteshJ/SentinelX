@@ -97,10 +97,34 @@ CREATE TABLE IF NOT EXISTS detection_rules (
     mitre_technique VARCHAR(20),
     conditions JSONB NOT NULL,
     tags TEXT[],
-    enabled BOOLEAN NOT NULL DEFAULT true,
+    status VARCHAR(20) NOT NULL DEFAULT 'active',
+    version INT NOT NULL DEFAULT 1,
+    parent_id UUID REFERENCES detection_rules(id),
     created_by UUID REFERENCES users(id),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS saved_hunts (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    query TEXT NOT NULL,
+    time_range VARCHAR(50) NOT NULL,
+    tags TEXT[],
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS custom_iocs (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    type VARCHAR(50) NOT NULL,
+    value VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    severity VARCHAR(20),
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
@@ -180,7 +204,7 @@ CREATE INDEX IF NOT EXISTS idx_knowledge_chunks_embedding
 -- excessive single-flow volume) — they are a reasonable, documented starting
 -- point for a rule set, not fabricated statistics, and are meant to be tuned.
 
-INSERT INTO detection_rules (rule_id, name, description, severity, mitre_technique, conditions, tags, enabled) VALUES
+INSERT INTO detection_rules (rule_id, name, description, severity, mitre_technique, conditions, tags, status, version) VALUES
 (
     'SIGMA-001',
     'Connection to Known Malicious Port',
@@ -191,7 +215,8 @@ INSERT INTO detection_rules (rule_id, name, description, severity, mitre_techniq
         {"field": "destination_port", "operator": "in", "value": [4444, 31337, 12345, 6666, 6667]}
     ]}'::jsonb,
     ARRAY['network', 'c2'],
-    true
+    'active',
+    1
 ),
 (
     'SIGMA-002',
@@ -203,7 +228,8 @@ INSERT INTO detection_rules (rule_id, name, description, severity, mitre_techniq
         {"field": "destination_port", "operator": "in", "value": [22, 23, 3389, 5900]}
     ]}'::jsonb,
     ARRAY['network', 'remote-access'],
-    true
+    'active',
+    1
 ),
 (
     'SIGMA-003',
@@ -215,7 +241,8 @@ INSERT INTO detection_rules (rule_id, name, description, severity, mitre_techniq
         {"field": "bytes_sent", "operator": "gte", "value": 50000000}
     ]}'::jsonb,
     ARRAY['network', 'exfiltration'],
-    true
+    'active',
+    1
 ),
 (
     'SIGMA-004',
@@ -229,6 +256,7 @@ INSERT INTO detection_rules (rule_id, name, description, severity, mitre_techniq
         {"field": "dns_query", "operator": "endswith", "value": ".biz"}
     ]}'::jsonb,
     ARRAY['dns'],
-    true
+    'active',
+    1
 )
 ON CONFLICT (rule_id) DO NOTHING;

@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import app.models  # noqa: F401
 
 from app.api.v1 import (
+    agent,
     ai_assistant,
     alerts,
     audit,
@@ -24,9 +25,11 @@ from app.api.v1 import (
     detection,
     events,
     experiments,
+    hunting,
     investigation,
     monitoring,
     reports,
+    rules,
     threat_intelligence,
     ws,
 )
@@ -86,7 +89,10 @@ app.include_router(experiments.router)
 app.include_router(ai_assistant.router)
 app.include_router(cases.router)
 app.include_router(investigation.router)
+app.include_router(hunting.router)
+app.include_router(rules.router)
 app.include_router(reports.router)
+app.include_router(agent.router)
 
 # Not yet implemented: /api/rules (CRUD for detection_rules — currently seed-only),
 # /api/mitre, /api/vulnerabilities (NVD/CVE browsing UI beyond raw enrichment).

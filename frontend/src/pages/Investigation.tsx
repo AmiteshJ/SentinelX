@@ -16,6 +16,13 @@ export function Investigation() {
   const [data, setData] = useState<InvestigationData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Manual SOAR Console state
+  const [manualAction, setManualAction] = useState("block_ip");
+  const [manualTarget, setManualTarget] = useState("");
+  const [manualStatus, setManualStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [manualExecuting, setManualExecuting] = useState(false);
 
   async function handleLoad(e: FormEvent) {
     e.preventDefault();
@@ -32,23 +39,147 @@ export function Investigation() {
     }
   }
 
+  async function handleTakeAction(action: string, target: string) {
+    if (!window.confirm(`Are you sure you want to execute ${action} on ${target}?`)) return;
+    setActionLoading(target);
+    try {
+      await apiClient.post("/api/agent/command", { action, target, incident_id: incidentId || undefined });
+      alert(`Successfully dispatched ${action} for ${target} to Live Agent`);
+      if (incidentId && data) {
+        handleLoad(new Event("submit") as any);
+      }
+    } catch (err: any) {
+      alert(err?.response?.data?.detail || "Failed to queue action");
+    } finally {
+      setActionLoading(null);
+    }
+  }
+
+  async function handleExecuteManualSoar(e: FormEvent) {
+    e.preventDefault();
+    if (!manualTarget.trim()) return;
+    setManualExecuting(true);
+    setManualStatus(null);
+    try {
+      await apiClient.post("/api/agent/command", {
+        action: manualAction,
+        target: manualTarget.trim(),
+        incident_id: incidentId || undefined,
+      });
+      setManualStatus({
+        type: "success",
+        message: `Command [${manualAction.toUpperCase()} -> ${manualTarget}] successfully queued! The SentinelX live agent will execute it immediately.`,
+      });
+      setManualTarget("");
+    } catch (err: any) {
+      setManualStatus({
+        type: "error",
+        message: err?.response?.data?.detail || "Failed to dispatch command to agent.",
+      });
+    } finally {
+      setManualExecuting(false);
+    }
+  }
+
   return (
     <DashboardShell>
       <div className="mb-4">
-        <h1 className="text-xl font-semibold text-slate-100">Investigation</h1>
-        <p className="text-sm text-slate-500">Full incident workspace: timeline, alerts, affected assets, MITRE mapping.</p>
+        <h1 className="text-xl font-semibold text-slate-100">Incident Investigation & SOAR Response</h1>
+        <p className="text-sm text-slate-500">
+          Analyze security incidents, investigate timelines, and execute live host containment actions.
+        </p>
       </div>
 
+      {/* Standalone SOAR Active Response Console */}
+      <div className="glass-panel mb-6 border-red-500/20 bg-red-950/10 p-5">
+        <div className="mb-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-red-400">
+              SOAR Active Response (Host Containment Console)
+            </h2>
+          </div>
+          <span className="text-[11px] text-slate-400">Targeting Live Connected Host Agents</span>
+        </div>
+
+        <form onSubmit={handleExecuteManualSoar} className="flex flex-col gap-3 sm:flex-row">
+          <select
+            value={manualAction}
+            onChange={(e) => setManualAction(e.target.value)}
+            className="rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs font-medium text-slate-200 outline-none focus:border-red-500"
+          >
+            <option value="block_ip">🛡️ Block IP (Firewall)</option>
+            <option value="kill_process">🛑 Kill Process (Host Taskkill)</option>
+            <option value="unblock_ip">🔓 Unblock IP (Remove Firewall Rule)</option>
+          </select>
+
+          <input
+            required
+            placeholder={manualAction === "kill_process" ? "Process Name or PID (e.g., notepad.exe)" : "Target IP Address (e.g., 198.51.100.25)"}
+            value={manualTarget}
+            onChange={(e) => setManualTarget(e.target.value)}
+            className="flex-1 rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-red-500"
+          />
+
+          <button
+            type="submit"
+            disabled={manualExecuting}
+            className="rounded-lg bg-red-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-red-600/20 hover:bg-red-500 disabled:opacity-50 transition-colors"
+          >
+            {manualExecuting ? "Dispatching..." : "Execute on Host Agent"}
+          </button>
+        </form>
+
+        {/* Quick presets for rapid testing */}
+        <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
+          <span>Quick Test Presets:</span>
+          <button
+            type="button"
+            onClick={() => { setManualAction("block_ip"); setManualTarget("198.51.100.25"); }}
+            className="rounded bg-slate-800/80 px-2 py-0.5 text-slate-300 hover:bg-slate-700"
+          >
+            Test IP: 198.51.100.25
+          </button>
+          <button
+            type="button"
+            onClick={() => { setManualAction("kill_process"); setManualTarget("notepad.exe"); }}
+            className="rounded bg-slate-800/80 px-2 py-0.5 text-slate-300 hover:bg-slate-700"
+          >
+            Test Process: notepad.exe
+          </button>
+        </div>
+
+        {manualStatus && (
+          <div
+            className={`mt-3 rounded-lg border p-3 text-xs ${
+              manualStatus.type === "success"
+                ? "border-emerald-500/40 bg-emerald-950/20 text-emerald-300"
+                : "border-red-500/40 bg-red-950/20 text-red-300"
+            }`}
+          >
+            {manualStatus.message}
+          </div>
+        )}
+      </div>
+
+      {/* Incident Deep Dive Search */}
+      <div className="mb-2">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Incident Deep Dive</h3>
+      </div>
       <form onSubmit={handleLoad} className="glass-panel mb-4 flex gap-2 p-4">
         <input
           required
-          placeholder="Incident ID (from Security Operations)"
+          placeholder="Enter Incident ID to load timeline and forensics (from Security Operations)"
           value={incidentId}
           onChange={(e) => setIncidentId(e.target.value)}
-          className="flex-1 rounded-lg border border-slate-700 bg-black/20 px-3 py-2 text-xs text-slate-100"
+          className="flex-1 rounded-lg border border-slate-700 bg-black/20 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-sx-blue"
         />
-        <button type="submit" disabled={loading} className="rounded-lg bg-sx-blue/90 px-4 py-2 text-xs font-medium text-black hover:bg-sx-blue disabled:opacity-50">
-          {loading ? "Loading…" : "Open"}
+        <button
+          type="submit"
+          disabled={loading}
+          className="rounded-lg bg-sx-blue/90 px-4 py-2 text-xs font-medium text-black hover:bg-sx-blue disabled:opacity-50"
+        >
+          {loading ? "Loading…" : "Open Incident"}
         </button>
       </form>
 
@@ -66,8 +197,19 @@ export function Investigation() {
             {data.affected_assets.ips.length === 0 ? (
               <p className="text-xs text-slate-500">None recorded.</p>
             ) : (
-              <ul className="space-y-1 text-xs text-slate-300">
-                {data.affected_assets.ips.map((ip) => <li key={ip}>{ip}</li>)}
+              <ul className="space-y-2 text-xs text-slate-300">
+                {data.affected_assets.ips.map((ip) => (
+                  <li key={ip} className="flex items-center justify-between">
+                    <span>{ip}</span>
+                    <button
+                      onClick={() => handleTakeAction("block_ip", ip)}
+                      disabled={actionLoading === ip}
+                      className="rounded bg-red-500/20 px-2 py-1 text-[10px] text-red-400 hover:bg-red-500/30 disabled:opacity-50"
+                    >
+                      {actionLoading === ip ? "Queuing..." : "Block IP"}
+                    </button>
+                  </li>
+                ))}
               </ul>
             )}
           </BentoCard>

@@ -21,12 +21,14 @@ router = APIRouter(prefix="/api/events", tags=["events"])
 async def ingest_events(payload: IngestRequest, user=Depends(get_current_user)):
     redis = get_redis()
 
+    pipe = redis.pipeline()
     for event in payload.events:
         event_dict = event.model_dump(mode="json")
         event_dict["mode"] = payload.mode.value
-        await redis.xadd(EVENTS_STREAM, {"payload": json.dumps(event_dict)})
+        pipe.xadd(EVENTS_STREAM, {"payload": json.dumps(event_dict)})
 
     # Record the most recent ingestion mode so the dashboard can reflect it honestly.
-    await redis.set(MODE_KEY, payload.mode.value)
+    pipe.set(MODE_KEY, payload.mode.value)
+    await pipe.execute()
 
     return IngestResponse(accepted=len(payload.events), mode=payload.mode)

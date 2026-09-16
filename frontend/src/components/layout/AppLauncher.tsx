@@ -13,6 +13,8 @@ import {
   Settings,
   ScrollText,
   X,
+  Target,
+  CodeXml,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
@@ -28,7 +30,8 @@ interface AppEntry {
 const APPS: AppEntry[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutGrid, description: "SOC overview" },
   { label: "Security Operations", path: "/security-operations", icon: ShieldAlert, description: "Alerts & incidents" },
-  { label: "Threat Detection", path: "/threat-detection", icon: Radar, description: "Detection engine" },
+  { label: "Threat Hunting", path: "/hunting", icon: Target, description: "Raw telemetry search" },
+  { label: "Detection Engineering", path: "/detection", icon: CodeXml, description: "Rule management" },
   { label: "Zero-Day Detection", path: "/zero-day", icon: ShieldQuestion, description: "GraphSAGE research" },
   { label: "Threat Intelligence & Risk", path: "/threat-intelligence", icon: Fingerprint, description: "IOCs & risk" },
   { label: "Investigation", path: "/investigation", icon: SearchIcon, description: "Case workspace" },
