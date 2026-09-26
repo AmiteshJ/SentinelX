@@ -17,6 +17,9 @@ import { CaseManagement } from "./pages/CaseManagement";
 import { Reports } from "./pages/Reports";
 import { Settings } from "./pages/Settings";
 import { AuditLogs } from "./pages/AuditLogs";
+import { KnowledgeBase } from "./pages/KnowledgeBase";
+import { MitreMatrix } from "./pages/MitreMatrix";
+import { GraphCorrelation } from "./pages/GraphCorrelation";
 import { ComingSoon } from "./pages/ComingSoon";
 import { useAuthStore } from "./store/authStore";
 import { FloatingIngestionBubble } from "./components/layout/FloatingIngestionBubble";
@@ -55,10 +58,12 @@ export default function App() {
         <Route path="/zero-day" element={<RequireAuth><ZeroDayDetection /></RequireAuth>} />
         <Route path="/threat-intelligence" element={<RequireAuth><ThreatIntelligence /></RequireAuth>} />
         <Route path="/investigation" element={<RequireAuth><Investigation /></RequireAuth>} />
+        <Route path="/correlation" element={<RequireAuth><GraphCorrelation /></RequireAuth>} />
+        <Route path="/mitre-matrix" element={<RequireAuth><MitreMatrix /></RequireAuth>} />
         <Route path="/ai-assistant" element={<RequireAuth><AiAssistant /></RequireAuth>} />
         <Route path="/reports" element={<RequireAuth><Reports /></RequireAuth>} />
         <Route path="/cases" element={<RequireAuth><CaseManagement /></RequireAuth>} />
-        <Route path="/knowledge-base" element={<RequireAuth><ComingSoon title="Knowledge Base" phase="Phase 16 — RAG/pgvector backend implemented; document-upload UI pending" /></RequireAuth>} />
+        <Route path="/knowledge-base" element={<RequireAuth><KnowledgeBase /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
         <Route path="/audit-logs" element={<RequireAuth><AuditLogs /></RequireAuth>} />
 

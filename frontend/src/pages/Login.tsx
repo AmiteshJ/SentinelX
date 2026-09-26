@@ -29,7 +29,11 @@ export function Login() {
       setUser(me.data);
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err?.response?.data?.detail || "Invalid credentials. Please try again.");
+      if (!err?.response) {
+        setError("Network error: Cannot reach the backend API at http://localhost:8000. Ensure uvicorn is running.");
+      } else {
+        setError(err?.response?.data?.detail || "Invalid credentials. Please try again.");
+      }
     } finally {
       setSubmitting(false);
     }

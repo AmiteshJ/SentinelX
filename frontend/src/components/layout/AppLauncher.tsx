@@ -15,6 +15,8 @@ import {
   X,
   Target,
   CodeXml,
+  Compass,
+  Network,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
@@ -30,6 +32,8 @@ interface AppEntry {
 const APPS: AppEntry[] = [
   { label: "Dashboard", path: "/dashboard", icon: LayoutGrid, description: "SOC overview" },
   { label: "Security Operations", path: "/security-operations", icon: ShieldAlert, description: "Alerts & incidents" },
+  { label: "MITRE ATT&CK Matrix", path: "/mitre-matrix", icon: Compass, description: "Enterprise tactics & heatmap" },
+  { label: "Graph Correlation", path: "/correlation", icon: Network, description: "Multi-hop entity relations" },
   { label: "Threat Hunting", path: "/hunting", icon: Target, description: "Raw telemetry search" },
   { label: "Detection Engineering", path: "/detection", icon: CodeXml, description: "Rule management" },
   { label: "Zero-Day Detection", path: "/zero-day", icon: ShieldQuestion, description: "GraphSAGE research" },

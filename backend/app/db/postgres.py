@@ -25,6 +25,8 @@ def _build_engine():
     url_obj = make_url(settings.postgres_database_url)
     query = dict(url_obj.query)
     ssl_requested = query.pop("ssl", None) or query.pop("sslmode", None)
+    query.pop("channel_binding", None)
+    query.pop("target_session_attrs", None)
     is_neon = "neon.tech" in (url_obj.host or "")
 
     connect_args = {}

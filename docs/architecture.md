@@ -52,18 +52,18 @@ placeholder ML metrics to make the UI look populated. Every value shown is eithe
 | 2 | Authentication + RBAC | ✅ done |
 | 3 | PostgreSQL + MongoDB + Redis | ✅ done (connections + schema + pgvector) |
 | 4 | Event ingestion | ✅ done (`/api/events/ingest`, `/api/datasets/upload`, Redis Streams) |
-| 5 | Live monitoring agent | ⏳ not started — LIVE mode + consent UI exist end-to-end, but no agent produces real telemetry yet |
+| 5 | Live monitoring agent | ✅ done (`agent/` daemon, live telemetry stream, real-time heartbeats, SOAR command execution & audit logging verified) |
 | 6 | Rule engine | ✅ done (`app/detection/rule_engine.py`, runs in `event_worker.py`) |
 | 7 | Sigma-inspired rules | ✅ done (4 seed rules in `database/postgres/init.sql`; no rule-management UI/API yet — seed-only) |
 | 8 | Threat intelligence | ✅ done (AbuseIPDB + URLhaus providers, local-first + graceful fallback, `/api/threat-intelligence`) |
 | 9 | IOC database | ✅ done (`malicious_urls` Mongo collection, analyst-add flow, Redis write-through cache) |
 | 10 | Risk scoring | ✅ done (`app/risk/risk_engine.py`, computed per incident) |
-| 11 | Alert correlation (graph) | 🟡 partial — naive same-source-IP/time-window grouping; full node/edge graph traversal not yet built |
+| 11 | Alert correlation (graph) + MITRE ATT&CK Matrix | ✅ done (`app/services/correlation_service.py`, `app/services/mitre_service.py`, `/api/correlation/graph`, `/api/mitre/matrix`, interactive force-directed graph in `/correlation` & Investigation, MITRE heatmap in `/mitre-matrix`) |
 | 12 | Isolation Forest | ✅ done (`app/detection/anomaly_engine.py`, `/api/detection/anomaly/run`, trained on real ingested events) |
 | 13 | ML comparison pipeline (RF/XGBoost/CNN/LSTM) | ✅ done (`ml/`, verified end-to-end for RF/XGBoost in this environment; CNN/LSTM syntax-verified, need `torch` installed to run) |
 | 14 | Graph construction | ✅ done (`ml/graphsage/graph_construction.py`) |
 | 15 | GraphSAGE zero-day research module | ✅ done (`ml/graphsage/`, `/api/experiments/run`; needs `torch-geometric` installed to run) |
-| 16 | RAG + pgvector | ✅ done (`app/ai/embeddings.py` with graceful non-ML fallback, `app/services/knowledge_service.py`; no document-upload UI yet) |
+| 16 | RAG + pgvector | ✅ done (`app/ai/embeddings.py`, `app/services/knowledge_service.py`, `/api/knowledge` endpoints + full Knowledge Base UI in `KnowledgeBase.tsx`) |
 | 17 | Groq AI Assistant | ✅ done (`app/ai/providers/`, Groq primary + Ollama fallback, `/api/ai/ask`) |
 | 18 | Investigation + Cases | ✅ done (`/api/investigation/{id}`, `/api/cases`, both pages wired) |
 | 19 | Reports | ✅ done (`/api/reports`, AI-drafted summary + real structured facts) |

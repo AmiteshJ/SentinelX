@@ -62,14 +62,14 @@ async def update_permissions(
     # Also set global agent active policy
     await redis.set("agent:active_policy", perms_json)
     
-    background_tasks.add_task(
-        log_action,
+    await log_action(
         db,
         user_id=user.id,
         action="update_agent_permissions",
         resource_type="agent",
         metadata=perms.model_dump()
     )
+    await db.commit()
     return perms
 
 @router.post("/heartbeat")
@@ -198,14 +198,14 @@ async def queue_command(
     
     await redis.lpush("agent:commands", json.dumps(command))
     
-    background_tasks.add_task(
-        log_action,
+    await log_action(
         db,
         user_id=user.id,
         action=f"agent_command_{req.action}",
         resource_type="agent",
         metadata={"target": req.target, "command_id": command_id, "incident_id": req.incident_id}
     )
+    await db.commit()
     
     return {"status": "queued", "command_id": command_id}
 
@@ -226,17 +226,16 @@ async def get_commands(user=Depends(get_current_user)):
 @router.post("/command-result")
 async def report_command_result(
     res: CommandResult,
-    background_tasks: BackgroundTasks,
     user=Depends(get_current_user),
     db: AsyncSession = Depends(get_db)
 ):
     """Agent reports success/failure of a command."""
-    background_tasks.add_task(
-        log_action,
+    await log_action(
         db,
         user_id=user.id,
         action=f"agent_command_result_{res.status}",
         resource_type="agent",
         metadata={"command_id": res.command_id, "output": res.output}
     )
+    await db.commit()
     return {"status": "recorded"}

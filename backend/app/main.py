@@ -20,6 +20,7 @@ from app.api.v1 import (
     audit,
     auth,
     cases,
+    correlation,
     dashboard,
     datasets,
     detection,
@@ -27,6 +28,8 @@ from app.api.v1 import (
     experiments,
     hunting,
     investigation,
+    knowledge,
+    mitre,
     monitoring,
     reports,
     rules,
@@ -49,6 +52,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
+    allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -93,6 +97,9 @@ app.include_router(hunting.router)
 app.include_router(rules.router)
 app.include_router(reports.router)
 app.include_router(agent.router)
+app.include_router(knowledge.router)
+app.include_router(mitre.router)
+app.include_router(correlation.router)
 
 # Not yet implemented: /api/rules (CRUD for detection_rules — currently seed-only),
-# /api/mitre, /api/vulnerabilities (NVD/CVE browsing UI beyond raw enrichment).
+# /api/vulnerabilities (NVD/CVE browsing UI beyond raw enrichment).

@@ -2,6 +2,9 @@ import { useState, type FormEvent } from "react";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { BentoCard } from "../components/ui/BentoCard";
 import { apiClient } from "../api/client";
+import { AttackGraph } from "../components/graph/AttackGraph";
+import { fetchIncidentCorrelationGraph, type IncidentGraphResponse } from "../api/correlation";
+import { Network, Clock, Shield, AlertTriangle } from "lucide-react";
 
 interface InvestigationData {
   incident: { id: string; title: string; severity: string; status: string; risk_score: number | null };
@@ -14,6 +17,8 @@ interface InvestigationData {
 export function Investigation() {
   const [incidentId, setIncidentId] = useState("");
   const [data, setData] = useState<InvestigationData | null>(null);
+  const [graphData, setGraphData] = useState<IncidentGraphResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<"overview" | "graph">("overview");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -31,9 +36,19 @@ export function Investigation() {
     try {
       const { data: res } = await apiClient.get(`/api/investigation/${incidentId}`);
       setData(res);
+
+      // Also load graph data
+      try {
+        const gRes = await fetchIncidentCorrelationGraph(incidentId);
+        setGraphData(gRes);
+      } catch (gErr) {
+        console.warn("Could not load incident graph", gErr);
+        setGraphData(null);
+      }
     } catch (err: any) {
       setError(err?.response?.data?.detail || "Incident not found.");
       setData(null);
+      setGraphData(null);
     } finally {
       setLoading(false);
     }
@@ -186,60 +201,122 @@ export function Investigation() {
       {error && <div className="glass-panel mb-4 border-red-500/30 p-4 text-sm text-red-300">{error}</div>}
 
       {data && (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-          <BentoCard title="Incident">
-            <p className="text-sm text-slate-200">{data.incident.title}</p>
-            <p className="mt-1 text-xs text-slate-500 capitalize">{data.incident.severity} · {data.incident.status}</p>
-            <p className="mt-1 text-xs text-slate-500">Risk score: {data.incident.risk_score ?? "—"}</p>
-          </BentoCard>
+        <div className="space-y-4">
+          {/* Tab Switcher */}
+          <div className="flex items-center gap-2 p-1.5 rounded-xl bg-slate-900/80 border border-slate-800 w-fit">
+            <button
+              onClick={() => setActiveTab("overview")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === "overview"
+                  ? "bg-sx-blue text-[#04101a] shadow-[0_0_12px_rgba(58,160,255,0.3)]"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Clock size={13} />
+              Forensics &amp; Timeline
+            </button>
+            <button
+              onClick={() => setActiveTab("graph")}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 ${
+                activeTab === "graph"
+                  ? "bg-cyan-500 text-[#04101a] shadow-[0_0_12px_rgba(6,182,212,0.3)]"
+                  : "text-slate-400 hover:text-white"
+              }`}
+            >
+              <Network size={13} />
+              Attack Entity Graph
+              {graphData && (
+                <span className="ml-1 px-1.5 py-0.2 rounded-full bg-black/30 text-[10px] font-mono">
+                  {graphData.nodes.length}
+                </span>
+              )}
+            </button>
+          </div>
 
-          <BentoCard title="Affected Assets">
-            {data.affected_assets.ips.length === 0 ? (
-              <p className="text-xs text-slate-500">None recorded.</p>
-            ) : (
-              <ul className="space-y-2 text-xs text-slate-300">
-                {data.affected_assets.ips.map((ip) => (
-                  <li key={ip} className="flex items-center justify-between">
-                    <span>{ip}</span>
-                    <button
-                      onClick={() => handleTakeAction("block_ip", ip)}
-                      disabled={actionLoading === ip}
-                      className="rounded bg-red-500/20 px-2 py-1 text-[10px] text-red-400 hover:bg-red-500/30 disabled:opacity-50"
-                    >
-                      {actionLoading === ip ? "Queuing..." : "Block IP"}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </BentoCard>
+          {activeTab === "overview" ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <BentoCard title="Incident">
+                <p className="text-sm text-slate-200">{data.incident.title}</p>
+                <p className="mt-1 text-xs text-slate-500 capitalize">{data.incident.severity} · {data.incident.status}</p>
+                <p className="mt-1 text-xs text-slate-500">Risk score: {data.incident.risk_score ?? "—"}</p>
+              </BentoCard>
 
-          <BentoCard title="MITRE Techniques">
-            {data.mitre_techniques.length === 0 ? (
-              <p className="text-xs text-slate-500">None recorded.</p>
-            ) : (
-              <div className="flex flex-wrap gap-1">
-                {data.mitre_techniques.map((t) => (
-                  <span key={t} className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300">{t}</span>
-                ))}
-              </div>
-            )}
-          </BentoCard>
+              <BentoCard title="Affected Assets">
+                {data.affected_assets.ips.length === 0 ? (
+                  <p className="text-xs text-slate-500">None recorded.</p>
+                ) : (
+                  <ul className="space-y-2 text-xs text-slate-300">
+                    {data.affected_assets.ips.map((ip) => (
+                      <li key={ip} className="flex items-center justify-between">
+                        <span>{ip}</span>
+                        <button
+                          onClick={() => handleTakeAction("block_ip", ip)}
+                          disabled={actionLoading === ip}
+                          className="rounded bg-red-500/20 px-2 py-1 text-[10px] text-red-400 hover:bg-red-500/30 disabled:opacity-50"
+                        >
+                          {actionLoading === ip ? "Queuing..." : "Block IP"}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </BentoCard>
 
-          <BentoCard title="Timeline" span={3}>
-            {data.timeline.length === 0 ? (
-              <p className="text-xs text-slate-500">No timeline events.</p>
-            ) : (
-              <ul className="space-y-2 text-xs">
-                {data.timeline.map((t, idx) => (
-                  <li key={idx} className="flex items-center gap-3 border-t border-slate-800/60 pt-2 first:border-t-0 first:pt-0">
-                    <span className="text-slate-500">{new Date(t.timestamp).toLocaleString()}</span>
-                    <span className="text-slate-200">{t.event}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </BentoCard>
+              <BentoCard title="MITRE Techniques">
+                {data.mitre_techniques.length === 0 ? (
+                  <p className="text-xs text-slate-500">None recorded.</p>
+                ) : (
+                  <div className="flex flex-wrap gap-1">
+                    {data.mitre_techniques.map((t) => (
+                      <span key={t} className="rounded-full border border-slate-700 px-2 py-0.5 text-[10px] text-slate-300">{t}</span>
+                    ))}
+                  </div>
+                )}
+              </BentoCard>
+
+              <BentoCard title="Timeline" span={3}>
+                {data.timeline.length === 0 ? (
+                  <p className="text-xs text-slate-500">No timeline events.</p>
+                ) : (
+                  <ul className="space-y-2 text-xs">
+                    {data.timeline.map((t, idx) => (
+                      <li key={idx} className="flex items-center gap-3 border-t border-slate-800/60 pt-2 first:border-t-0 first:pt-0">
+                        <span className="text-slate-500">{new Date(t.timestamp).toLocaleString()}</span>
+                        <span className="text-slate-200">{t.event}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </BentoCard>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {graphData ? (
+                <>
+                  {graphData.summary.choke_points.length > 0 && (
+                    <div className="p-3.5 rounded-2xl bg-cyan-950/20 border border-cyan-500/30 flex items-center justify-between text-xs">
+                      <span className="text-slate-300 font-semibold flex items-center gap-2">
+                        <Network size={14} className="text-cyan-400" />
+                        Identified Attack Pivot Choke Points:
+                      </span>
+                      <div className="flex items-center gap-2">
+                        {graphData.summary.choke_points.map((cp) => (
+                          <span key={cp.id} className="px-2.5 py-1 rounded-lg bg-slate-900 border border-cyan-500/40 font-mono text-cyan-300 text-[11px]">
+                            {cp.label} ({cp.degree} links)
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <AttackGraph nodes={graphData.nodes} edges={graphData.edges} height={520} />
+                </>
+              ) : (
+                <div className="p-8 rounded-2xl bg-slate-900 text-center text-slate-400 text-xs">
+                  Loading incident graph...
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </DashboardShell>

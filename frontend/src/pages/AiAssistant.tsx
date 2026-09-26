@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
+import { useSearchParams } from "react-router-dom";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { apiClient } from "../api/client";
 
@@ -8,10 +9,18 @@ interface ChatMessage {
 }
 
 export function AiAssistant() {
+  const [searchParams] = useSearchParams();
   const [incidentId, setIncidentId] = useState("");
   const [question, setQuestion] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const promptParam = searchParams.get("prompt") || searchParams.get("q");
+    if (promptParam) {
+      setQuestion(promptParam);
+    }
+  }, [searchParams]);
 
   async function handleAsk(e: FormEvent) {
     e.preventDefault();

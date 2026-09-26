@@ -152,3 +152,39 @@ export interface AuditLogEntry {
   resource_id: string | null;
   created_at: string;
 }
+
+export interface KnowledgeStats {
+  total_chunks: number;
+  total_documents: number;
+  total_sources: number;
+  vector_dimension: number;
+  embedding_model: string;
+  index_type: string;
+  vector_store: string;
+}
+
+export interface KnowledgeDocument {
+  document_title: string;
+  source: string;
+  chunk_count: number;
+  created_at: string;
+}
+
+export interface KnowledgeChunk {
+  id: string;
+  document_title: string;
+  source: string;
+  chunk_index: number;
+  content: string;
+  created_at: string;
+}
+
+export interface SemanticSearchResult {
+  id: string;
+  document_title: string;
+  source: string;
+  chunk_index: number;
+  content: string;
+  similarity: number;
+}
+
