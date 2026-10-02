@@ -21,6 +21,7 @@ import { KnowledgeBase } from "./pages/KnowledgeBase";
 import { MitreMatrix } from "./pages/MitreMatrix";
 import { GraphCorrelation } from "./pages/GraphCorrelation";
 import { ComingSoon } from "./pages/ComingSoon";
+import { MalwareAnalysis } from "./pages/MalwareAnalysis";
 import { useAuthStore } from "./store/authStore";
 import { FloatingIngestionBubble } from "./components/layout/FloatingIngestionBubble";
 import { PermissionConsentModal } from "./components/permissions/PermissionConsentModal";
@@ -57,6 +58,7 @@ export default function App() {
         <Route path="/detection" element={<RequireAuth><DetectionEngineering /></RequireAuth>} />
         <Route path="/zero-day" element={<RequireAuth><ZeroDayDetection /></RequireAuth>} />
         <Route path="/threat-intelligence" element={<RequireAuth><ThreatIntelligence /></RequireAuth>} />
+        <Route path="/malware-analysis" element={<RequireAuth><MalwareAnalysis /></RequireAuth>} />
         <Route path="/investigation" element={<RequireAuth><Investigation /></RequireAuth>} />
         <Route path="/correlation" element={<RequireAuth><GraphCorrelation /></RequireAuth>} />
         <Route path="/mitre-matrix" element={<RequireAuth><MitreMatrix /></RequireAuth>} />

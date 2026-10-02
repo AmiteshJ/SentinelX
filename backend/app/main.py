@@ -1,11 +1,6 @@
 """
 SentinelX backend entrypoint.
-
-Phase 1-2 scope: architecture, auth/OTP/RBAC, database connectivity, and a
-real (non-fabricated) dashboard health/overview endpoint. Detection,
-threat intel, ML, and AI routers are added incrementally in later phases —
-see docs/architecture.md for the full roadmap and app/api/v1/ for routers
-that exist today.
+Updated: Threat intel delete endpoint added.
 """
 import structlog
 from fastapi import FastAPI
@@ -29,6 +24,7 @@ from app.api.v1 import (
     hunting,
     investigation,
     knowledge,
+    malware,
     mitre,
     monitoring,
     reports,
@@ -98,6 +94,7 @@ app.include_router(rules.router)
 app.include_router(reports.router)
 app.include_router(agent.router)
 app.include_router(knowledge.router)
+app.include_router(malware.router)
 app.include_router(mitre.router)
 app.include_router(correlation.router)
 

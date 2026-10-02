@@ -69,6 +69,61 @@ async def create_malicious_url(
     return doc
 
 
+@router.delete("/urls/{url_id}")
+async def delete_malicious_url(
+    url_id: str,
+    user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+):
+    from bson import ObjectId
+    from app.db.postgres import AsyncSessionLocal
+    from app.db.redis_client import get_redis
+    from app.services.ioc_service import MALICIOUS_URL_CACHE_KEY
+
+    mongo_db = get_mongo_db()
+    doc = None
+    try:
+        doc = await mongo_db.malicious_urls.find_one({"_id": ObjectId(url_id)})
+    except Exception:
+        pass
+
+    if not doc:
+        doc = await mongo_db.malicious_urls.find_one({"id": url_id})
+    if not doc:
+        doc = await mongo_db.malicious_urls.find_one({"url": url_id})
+
+    if not doc:
+        raise HTTPException(status_code=404, detail="IOC URL not found")
+
+    # Delete from MongoDB
+    await mongo_db.malicious_urls.delete_one({"_id": doc["_id"]})
+
+    # Delete from Redis cache
+    normalized = doc.get("normalized_url")
+    if normalized:
+        try:
+            redis = get_redis()
+            await redis.srem(MALICIOUS_URL_CACHE_KEY, normalized)
+        except Exception:
+            pass
+
+    # Audit log
+    try:
+        async with AsyncSessionLocal() as db:
+            await audit_service.log_action(
+                db,
+                user_id=user.id,
+                action="ioc.delete",
+                resource_type="malicious_url",
+                resource_id=str(doc["_id"]),
+                metadata={"url": doc.get("url")},
+            )
+            await db.commit()
+    except Exception:
+        pass
+
+    return {"success": True, "message": "IOC successfully removed from Threat Intelligence database and cache."}
+
+
 @router.get("/urls/check")
 async def check_url(url: str, user=Depends(get_current_user)):
     """Real-time lookup used by the URL detection flow (spec §18)."""

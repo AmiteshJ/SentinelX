@@ -17,6 +17,7 @@ import {
   CodeXml,
   Compass,
   Network,
+  Bug,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
@@ -38,6 +39,7 @@ const APPS: AppEntry[] = [
   { label: "Detection Engineering", path: "/detection", icon: CodeXml, description: "Rule management" },
   { label: "Zero-Day Detection", path: "/zero-day", icon: ShieldQuestion, description: "GraphSAGE research" },
   { label: "Threat Intelligence & Risk", path: "/threat-intelligence", icon: Fingerprint, description: "IOCs & risk" },
+  { label: "Malware Analysis & Sandbox", path: "/malware-analysis", icon: Bug, description: "Static & dynamic detonation" },
   { label: "Investigation", path: "/investigation", icon: SearchIcon, description: "Case workspace" },
   { label: "AI SOC Assistant", path: "/ai-assistant", icon: MessageSquareText, description: "Groq-powered analysis" },
   { label: "Reports", path: "/reports", icon: FileText, description: "Incident reporting" },
