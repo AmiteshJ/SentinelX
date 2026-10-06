@@ -25,8 +25,13 @@ import {
   CheckCircle2,
   RefreshCw,
   FolderOpen,
+  Network,
+  ArrowRight,
+  Briefcase,
 } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { DashboardShell } from "../components/layout/DashboardShell";
+import { GraphCorrelationModal } from "../components/graph/GraphCorrelationModal";
 import { apiClient } from "../api/client";
 import { useRealtimeUpdates } from "../hooks/useRealtimeUpdates";
 import { useTheme } from "../theme/ThemeProvider";
@@ -403,6 +408,14 @@ export function Dashboard() {
   const stopStream = useStreamStore((s) => s.stopStream);
 
   const [systemMode, setSystemMode] = useState<string>("OFFLINE");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("view") === "correlation" || searchParams.get("graph") === "open") {
+      setIsGraphModalOpen(true);
+    }
+  }, [searchParams]);
 
   const palette: Palette = useMemo(() => (theme === "dark" ? DARK_PALETTE : LIGHT_PALETTE), [theme]);
 
@@ -483,33 +496,61 @@ export function Dashboard() {
             </p>
           </motion.div>
 
-          {/* Mode Switch Toggle Pill */}
-          <div className="flex items-center gap-2 rounded-2xl border p-1.5 shadow-lg backdrop-blur-md" style={{ borderColor: palette.border, backgroundColor: palette.surface }}>
+          {/* Header Controls: Graph Correlation Box + Mode Switch Toggle Pill */}
+          <div className="flex flex-wrap items-center gap-2.5">
+            {/* Small clickable box: Graph Correlation Insights */}
             <button
-              onClick={() => handleToggleMode("OFFLINE")}
-              className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
-                systemMode !== "LIVE"
-                  ? "bg-slate-800/90 text-white shadow-md border border-slate-700/60"
-                  : "text-slate-400 hover:text-white"
-              }`}
+              type="button"
+              onClick={() => setIsGraphModalOpen(true)}
+              className="group flex items-center gap-2.5 rounded-2xl border px-3.5 py-1.5 shadow-md backdrop-blur-md transition-all duration-200 hover:border-cyan-500/50 hover:bg-cyan-950/20 active:scale-95 text-left cursor-pointer"
+              style={{ borderColor: palette.border, backgroundColor: palette.surface }}
+              title="Open Graph Correlation insights and multi-hop attack paths"
             >
-              <span className={`h-2 w-2 rounded-full ${isStreaming ? "bg-cyan-400 animate-pulse" : "bg-slate-400"}`} />
-              Offline Demo / Ingestion
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 group-hover:scale-105 group-hover:shadow-[0_0_12px_rgba(6,182,212,0.4)] transition-all">
+                <Network size={14} />
+              </div>
+              <div className="leading-tight">
+                <div className="flex items-center gap-1.5 text-xs font-semibold text-slate-200 group-hover:text-cyan-300 transition-colors">
+                  <span>Graph Correlation</span>
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
+                  </span>
+                </div>
+                <div className="text-[10px] text-slate-400 group-hover:text-slate-300">
+                  Attack paths &amp; choke points
+                </div>
+              </div>
             </button>
-            <button
-              onClick={() => handleToggleMode("LIVE")}
-              className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
-                systemMode === "LIVE"
-                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.3)]"
-                  : "text-slate-400 hover:text-white"
-              }`}
-            >
-              <span className="relative flex h-2 w-2">
-                {systemMode === "LIVE" && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
-                <span className={`relative inline-flex h-2 w-2 rounded-full ${systemMode === "LIVE" ? "bg-emerald-400" : "bg-slate-500"}`} />
-              </span>
-              Online Live Data
-            </button>
+
+            {/* Mode Switch Toggle Pill */}
+            <div className="flex items-center gap-2 rounded-2xl border p-1.5 shadow-lg backdrop-blur-md" style={{ borderColor: palette.border, backgroundColor: palette.surface }}>
+              <button
+                onClick={() => handleToggleMode("OFFLINE")}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  systemMode !== "LIVE"
+                    ? "bg-slate-800/90 text-white shadow-md border border-slate-700/60"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full ${isStreaming ? "bg-cyan-400 animate-pulse" : "bg-slate-400"}`} />
+                Offline Demo / Ingestion
+              </button>
+              <button
+                onClick={() => handleToggleMode("LIVE")}
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
+                  systemMode === "LIVE"
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.3)]"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                <span className="relative flex h-2 w-2">
+                  {systemMode === "LIVE" && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
+                  <span className={`relative inline-flex h-2 w-2 rounded-full ${systemMode === "LIVE" ? "bg-emerald-400" : "bg-slate-500"}`} />
+                </span>
+                Online Live Data
+              </button>
+            </div>
           </div>
         </div>
 
@@ -793,16 +834,59 @@ export function Dashboard() {
             </Panel>
 
             {/* Active Incidents — hero stat */}
-            <Panel className="min-h-[220px] p-5" palette={palette}>
+            <Panel className="min-h-[220px] p-5 flex flex-col justify-between" palette={palette}>
               <CometArt palette={palette} />
-              <PanelHeader icon={ShieldAlert} title="Incident Overview" palette={palette} />
-              <div className="relative z-10 flex items-baseline gap-2">
-                <AnimatedNumber
-                  value={data.active_incidents}
-                  className="font-mono text-4xl font-semibold tabular-nums"
-                  color={palette.text}
+              <div>
+                <PanelHeader
+                  icon={ShieldAlert}
+                  title="Incident Overview"
+                  palette={palette}
+                  right={
+                    <Link
+                      to="/cases"
+                      className="group inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-semibold transition-all hover:scale-105 active:scale-95 cursor-pointer shadow-sm"
+                      style={{
+                        borderColor: palette.borderHover,
+                        backgroundColor: "rgba(58,160,255,0.12)",
+                        color: palette.primaryGlow,
+                      }}
+                      title="Open Case Management"
+                    >
+                      <Briefcase size={11} />
+                      <span>Cases</span>
+                      <ArrowRight size={11} className="transition-transform group-hover:translate-x-0.5" />
+                    </Link>
+                  }
                 />
-                <span className="text-xs" style={{ color: palette.textMuted }}>active incidents</span>
+                <div className="relative z-10 flex items-baseline gap-2">
+                  <AnimatedNumber
+                    value={data.active_incidents}
+                    className="font-mono text-4xl font-semibold tabular-nums"
+                    color={palette.text}
+                  />
+                  <span className="text-xs" style={{ color: palette.textMuted }}>active incidents</span>
+                </div>
+              </div>
+
+              {/* Navigation bubble footer button */}
+              <div className="relative z-10 mt-4 pt-3 border-t flex items-center justify-between" style={{ borderColor: palette.hairline }}>
+                <span className="text-[11px] font-medium" style={{ color: palette.textMuted }}>
+                  Triage &amp; Investigate
+                </span>
+                <Link
+                  to="/cases"
+                  className="group inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-semibold shadow-md transition-all hover:border-cyan-400 hover:bg-cyan-500/10 cursor-pointer"
+                  style={{
+                    borderColor: palette.border,
+                    backgroundColor: palette.surface,
+                    color: palette.text,
+                  }}
+                >
+                  <span>View in Cases</span>
+                  <span className="flex h-4 w-4 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
+                    <ArrowRight size={10} />
+                  </span>
+                </Link>
               </div>
             </Panel>
 
@@ -933,6 +1017,16 @@ export function Dashboard() {
           </motion.div>
         ) : null}
       </DashboardShell>
+
+      <GraphCorrelationModal
+        isOpen={isGraphModalOpen}
+        onClose={() => {
+          setIsGraphModalOpen(false);
+          if (searchParams.get("view") === "correlation" || searchParams.get("graph") === "open") {
+            setSearchParams({});
+          }
+        }}
+      />
     </>
   );
 }

@@ -5,7 +5,8 @@ from typing import Any
 ALLOWED_FIELDS = {
     "source_ip", "destination_ip", "source_port", "destination_port", 
     "protocol", "hostname", "username", "process_name", "domain", 
-    "url", "event_type", "action", "severity", "timestamp"
+    "url", "event_type", "action", "severity", "timestamp",
+    "bytes_sent", "bytes_received", "bytes", "label"
 }
 
 class ParseError(Exception):

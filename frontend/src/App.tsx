@@ -60,10 +60,10 @@ export default function App() {
         <Route path="/threat-intelligence" element={<RequireAuth><ThreatIntelligence /></RequireAuth>} />
         <Route path="/malware-analysis" element={<RequireAuth><MalwareAnalysis /></RequireAuth>} />
         <Route path="/investigation" element={<RequireAuth><Investigation /></RequireAuth>} />
-        <Route path="/correlation" element={<RequireAuth><GraphCorrelation /></RequireAuth>} />
+        <Route path="/correlation" element={<Navigate to="/dashboard?view=correlation" replace />} />
         <Route path="/mitre-matrix" element={<RequireAuth><MitreMatrix /></RequireAuth>} />
         <Route path="/ai-assistant" element={<RequireAuth><AiAssistant /></RequireAuth>} />
-        <Route path="/reports" element={<RequireAuth><Reports /></RequireAuth>} />
+        <Route path="/reports" element={<RequireAuth><CaseManagement /></RequireAuth>} />
         <Route path="/cases" element={<RequireAuth><CaseManagement /></RequireAuth>} />
         <Route path="/knowledge-base" element={<RequireAuth><KnowledgeBase /></RequireAuth>} />
         <Route path="/settings" element={<RequireAuth><Settings /></RequireAuth>} />
