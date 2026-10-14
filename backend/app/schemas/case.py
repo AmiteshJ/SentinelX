@@ -24,6 +24,7 @@ class CaseOut(BaseModel):
     severity: str
     status: str
     assigned_analyst_id: uuid.UUID | None
+    user_id: uuid.UUID | None = None
     related_incident_ids: list[uuid.UUID] | None
     created_at: datetime
     updated_at: datetime

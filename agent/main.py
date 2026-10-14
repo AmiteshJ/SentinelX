@@ -11,8 +11,30 @@ from transport.client import SentinelXClient
 from executor import CommandExecutor
 
 async def main():
+    import argparse
+    parser = argparse.ArgumentParser(description="SentinelX Endpoint Agent")
+    parser.add_argument("--token", help="SentinelX Agent Enrollment Token")
+    parser.add_argument("--api-url", help="SentinelX backend API URL")
+    args, _ = parser.parse_known_args()
+
     load_dotenv()
-    
+
+    if args.token:
+        os.environ["SENTINELX_AGENT_TOKEN"] = args.token
+        # Persist token to .env for future runs
+        try:
+            env_file = os.path.join(os.path.dirname(__file__), ".env")
+            with open(env_file, "a+", encoding="utf-8") as f:
+                f.seek(0)
+                content = f.read()
+                if "SENTINELX_AGENT_TOKEN" not in content:
+                    f.write(f"\nSENTINELX_AGENT_TOKEN={args.token}\n")
+        except Exception:
+            pass
+
+    if args.api_url:
+        os.environ["SENTINELX_API_URL"] = args.api_url
+
     api_url = os.getenv("SENTINELX_API_URL", "http://localhost:8000")
     poll_interval = int(os.getenv("AGENT_POLL_INTERVAL", "5"))
     hostname = socket.gethostname()
@@ -87,6 +109,9 @@ async def main():
                     print("[Policy Notice] Host telemetry streaming is currently PAUSED by user permissions.")
             else:
                 if events:
+                    for ev in events:
+                        if "raw" in ev and isinstance(ev["raw"], dict):
+                            ev["raw"]["hostname"] = hostname
                     for i in range(0, len(events), 200):
                         batch = events[i:i+200]
                         await client.send_events(batch)

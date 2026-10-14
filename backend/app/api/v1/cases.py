@@ -15,8 +15,15 @@ VALID_STATUSES = {"open", "investigating", "contained", "resolved", "closed"}
 
 
 @router.get("", response_model=list[CaseOut])
-async def list_cases(status_filter: str | None = None, db: AsyncSession = Depends(get_db), user=Depends(get_current_user)):
+async def list_cases(
+    status_filter: str | None = None,
+    scope: str = "personal",
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user)
+):
     stmt = select(Case).order_by(Case.updated_at.desc())
+    if scope == "personal":
+        stmt = stmt.where((Case.user_id == user.id) | (Case.assigned_analyst_id == user.id))
     if status_filter:
         stmt = stmt.where(Case.status == status_filter)
     result = await db.execute(stmt)
@@ -31,6 +38,7 @@ async def create_case(payload: CaseIn, db: AsyncSession = Depends(get_db), user=
         severity=payload.severity,
         related_incident_ids=payload.related_incident_ids,
         assigned_analyst_id=user.id,
+        user_id=user.id,
     )
     db.add(case)
     await db.flush()

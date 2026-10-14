@@ -15,8 +15,10 @@ import {
   ChevronDown,
   AlertTriangle,
   X,
+  Laptop,
 } from "lucide-react";
 import { AppLauncher } from "./AppLauncher";
+import { ScopeSwitcher } from "./ScopeSwitcher";
 import { useTheme } from "../../theme/ThemeProvider";
 import { useAuthStore } from "../../store/authStore";
 import { useStreamStore } from "../../store/streamStore";
@@ -104,6 +106,9 @@ export function TopBar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Personal vs Fleet SOC Scope Switcher */}
+          {user && <ScopeSwitcher />}
+
           {/* EDR Host Shield & Permissions Controller */}
           <div className="relative" ref={popoverRef}>
             <button
@@ -212,29 +217,36 @@ export function TopBar() {
                 )}
 
                 {/* Action Buttons */}
-                <div className="flex items-center justify-between pt-2 border-t border-slate-800 gap-2">
-                  {!agentOnline ? (
-                    <button
-                      onClick={handleStartAgent}
-                      disabled={isStartingAgent}
-                      className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-emerald-500 disabled:opacity-50 transition-colors"
-                    >
-                      <Play size={12} />
-                      {isStartingAgent ? "Starting..." : "Auto-Start Agent"}
-                    </button>
-                  ) : (
+                <div className="flex flex-col gap-2 pt-2 border-t border-slate-800">
+                  <div className="flex items-center justify-between gap-2">
+                    {!agentOnline ? (
+                      <button
+                        onClick={handleStartAgent}
+                        disabled={isStartingAgent}
+                        className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-cyan-500 px-3 py-1.5 text-xs font-bold text-black hover:bg-cyan-400 disabled:opacity-50 transition-colors shadow"
+                      >
+                        <Play size={12} />
+                        {isStartingAgent ? "Pairing & Starting..." : "Auto-Connect Local PC"}
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                        <Check size={12} /> Protecting {agentDetails?.hostname || "Host"}
+                      </span>
+                    )}
                     <button
                       onClick={() => openConsentModal()}
-                      className="text-[11px] text-sx-blue hover:underline"
+                      className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] text-slate-300 hover:bg-slate-800 transition-colors"
                     >
-                      Configure All Permissions
+                      Manage
                     </button>
-                  )}
+                  </div>
+
                   <button
                     onClick={() => openConsentModal()}
-                    className="rounded border border-slate-700 bg-slate-900 px-2 py-1 text-[11px] text-slate-300 hover:bg-slate-800"
+                    className="flex items-center justify-center gap-1 text-[11px] text-indigo-400 hover:text-indigo-300 transition-colors py-0.5"
                   >
-                    Manage
+                    <Laptop size={12} />
+                    <span>Enroll Teammate / Remote Laptop</span>
                   </button>
                 </div>
               </div>

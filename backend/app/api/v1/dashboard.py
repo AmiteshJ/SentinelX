@@ -22,7 +22,12 @@ router = APIRouter(prefix="/api/dashboard", tags=["dashboard"])
 
 
 @router.get("/overview", response_model=DashboardOverview)
-async def overview(db: AsyncSession = Depends(get_db), user=Depends(get_current_user)):
+async def overview(
+    scope: str = "personal",
+    host: str | None = None,
+    db: AsyncSession = Depends(get_db),
+    user=Depends(get_current_user)
+):
     # Run DB health checks concurrently
     postgres_ok, mongo_ok, redis_ok = await asyncio.gather(
         check_postgres_health(),
@@ -38,7 +43,20 @@ async def overview(db: AsyncSession = Depends(get_db), user=Depends(get_current_
         if not postgres_ok:
             return 0
         try:
-            result = await db.execute(text("SELECT count(*) FROM incidents WHERE status != 'closed'"))
+            if scope == "personal":
+                query_str = "SELECT count(*) FROM incidents WHERE status != 'closed' AND user_id = :uid"
+                params = {"uid": user.id}
+                if host:
+                    query_str += " AND (hostname = :host OR hostname IS NULL)"
+                    params["host"] = host
+                result = await db.execute(text(query_str), params)
+            else:
+                query_str = "SELECT count(*) FROM incidents WHERE status != 'closed'"
+                params = {}
+                if host:
+                    query_str += " AND (hostname = :host OR hostname IS NULL)"
+                    params["host"] = host
+                result = await db.execute(text(query_str), params)
             return result.scalar_one() or 0
         except Exception:
             return 0
@@ -49,9 +67,16 @@ async def overview(db: AsyncSession = Depends(get_db), user=Depends(get_current_
             return counts
         try:
             mongo_db = get_mongo_db()
+            async def get_count(s: str):
+                f: dict = {"severity": s, "status": "open"}
+                if scope == "personal":
+                    f["user_id"] = str(user.id)
+                if host:
+                    f["$or"] = [{"hostname": host}, {"hostname": None}]
+                return await mongo_db.alerts.count_documents(f)
+
             results = await asyncio.gather(*[
-                mongo_db.alerts.count_documents({"severity": s, "status": "open"})
-                for s in ["critical", "high", "medium", "low"]
+                get_count(s) for s in ["critical", "high", "medium", "low"]
             ], return_exceptions=True)
             for idx, s in enumerate(["critical", "high", "medium", "low"]):
                 val = results[idx]

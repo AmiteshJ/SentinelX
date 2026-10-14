@@ -1,0 +1,11 @@
+{
+  "include": [
+    "backend",
+    "agent",
+    "database",
+    "scripts"
+  ],
+  "extraPaths": [
+    "backend"
+  ]
+}

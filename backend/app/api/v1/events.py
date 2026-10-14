@@ -25,7 +25,12 @@ async def ingest_events(payload: IngestRequest, user=Depends(get_current_user)):
     for event in payload.events:
         event_dict = event.model_dump(mode="json")
         event_dict["mode"] = payload.mode.value
+        event_dict["user_id"] = str(user.id)
+        event_dict["user_email"] = user.email
+        if not event_dict.get("hostname") and isinstance(event_dict.get("raw"), dict):
+            event_dict["hostname"] = event_dict["raw"].get("hostname")
         pipe.xadd(EVENTS_STREAM, {"payload": json.dumps(event_dict)})
+
 
     # Record the most recent ingestion mode so the dashboard can reflect it honestly.
     pipe.set(MODE_KEY, payload.mode.value)

@@ -37,6 +37,7 @@ import { useRealtimeUpdates } from "../hooks/useRealtimeUpdates";
 import { useTheme } from "../theme/ThemeProvider";
 import type { DashboardOverview, DatasetFile, DatasetStreamStatus } from "../types/api";
 import { useStreamStore } from "../store/streamStore";
+import { useWorkspaceStore } from "../store/workspaceStore";
 
 // ---------------------------------------------------------------------------
 // Design tokens — one dark palette (SOC command-deck), one light palette
@@ -393,6 +394,7 @@ export function Dashboard() {
   const [loading, setLoading] = useState(true);
   const { updates, connected } = useRealtimeUpdates();
   const { theme } = useTheme();
+  const { scope, selectedHost } = useWorkspaceStore();
 
   // Global Dataset Ingestion & Streaming state
   const datasetFiles = useStreamStore((s) => s.files);
@@ -420,8 +422,11 @@ export function Dashboard() {
   const palette: Palette = useMemo(() => (theme === "dark" ? DARK_PALETTE : LIGHT_PALETTE), [theme]);
 
   function refresh() {
+    const params: Record<string, any> = { scope };
+    if (selectedHost) params.host = selectedHost;
+
     apiClient
-      .get<DashboardOverview>("/api/dashboard/overview")
+      .get<DashboardOverview>("/api/dashboard/overview", { params })
       .then((res) => {
         setData(res.data);
         setSystemMode(res.data.monitoring_mode);
@@ -432,7 +437,7 @@ export function Dashboard() {
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [scope, selectedHost]);
 
   useEffect(() => {
     if (updates.length > 0) refresh();

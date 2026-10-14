@@ -36,6 +36,7 @@ import {
 } from "lucide-react";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { apiClient } from "../api/client";
+import { useWorkspaceStore } from "../store/workspaceStore";
 import type { Case, Report } from "../types/api";
 
 const STATUSES = ["open", "investigating", "contained", "resolved", "closed"] as const;
@@ -137,15 +138,20 @@ export function CaseManagement() {
   // Copy feedback state
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const { scope, selectedHost } = useWorkspaceStore();
+
   // Load all data
   async function loadData() {
     setLoading(true);
     setError(null);
     try {
+      const incParams: Record<string, any> = { limit: 50, scope };
+      if (selectedHost) incParams.host = selectedHost;
+
       const [casesRes, reportsRes, incRes] = await Promise.allSettled([
-        apiClient.get<Case[]>("/api/cases"),
+        apiClient.get<Case[]>("/api/cases", { params: { scope } }),
         apiClient.get<{ items: Report[] }>("/api/reports"),
-        apiClient.get<{ items: IncidentSummary[] }>("/api/incidents?limit=50"),
+        apiClient.get<{ items: IncidentSummary[] }>("/api/incidents", { params: incParams }),
       ]);
 
       if (casesRes.status === "fulfilled") {
@@ -170,7 +176,7 @@ export function CaseManagement() {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [scope, selectedHost]);
 
   // Inspect incident details: fetch source, causing rules, targets, timeline
   async function handleInspectIncident(id: string) {

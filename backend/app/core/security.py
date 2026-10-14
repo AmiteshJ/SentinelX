@@ -45,6 +45,14 @@ def create_refresh_token(subject: str) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
 
 
+def create_agent_token(subject: str, email: str | None = None, days: int = 365) -> str:
+    """Long-lived token for endpoint agent enrollment without exposing passwords."""
+    expire = datetime.now(timezone.utc) + timedelta(days=days)
+    to_encode = {"sub": subject, "exp": expire, "type": "agent", "email": email or ""}
+    return jwt.encode(to_encode, settings.secret_key, algorithm=ALGORITHM)
+
+
+
 def decode_token(token: str) -> dict:
     return jwt.decode(token, settings.secret_key, algorithms=[ALGORITHM])
 

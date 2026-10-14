@@ -53,6 +53,8 @@ export interface Alert {
   source_ip: string | null;
   destination_ip: string | null;
   status: string;
+  user_id?: string | null;
+  hostname?: string | null;
   created_at: string;
 }
 
@@ -63,6 +65,8 @@ export interface Incident {
   status: string;
   risk_score: number | null;
   alert_count: number;
+  user_id?: string | null;
+  hostname?: string | null;
   created_at: string;
   updated_at: string;
 }

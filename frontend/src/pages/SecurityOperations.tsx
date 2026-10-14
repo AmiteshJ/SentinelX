@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { apiClient } from "../api/client";
 import { useRealtimeUpdates } from "../hooks/useRealtimeUpdates";
+import { useWorkspaceStore } from "../store/workspaceStore";
 import type { Alert, Incident } from "../types/api";
 
 type Tab = "all" | "alerts" | "incidents" | "critical";
@@ -29,14 +30,20 @@ export function SecurityOperations() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { updates, connected } = useRealtimeUpdates();
+  const { scope, selectedHost } = useWorkspaceStore();
 
   async function load() {
     setLoading(true);
     setError(null);
     const severityParam = tab === "critical" ? "critical" : undefined;
+    const baseParams: Record<string, any> = { limit: 100, scope };
+    if (selectedHost) {
+      baseParams.host = selectedHost;
+    }
+
     const [alertsResult, incidentsResult] = await Promise.allSettled([
-      apiClient.get("/api/alerts", { params: { severity: severityParam, limit: 100 } }),
-      apiClient.get("/api/incidents", { params: { limit: 100 } }),
+      apiClient.get("/api/alerts", { params: { ...baseParams, severity: severityParam } }),
+      apiClient.get("/api/incidents", { params: baseParams }),
     ]);
 
     let loadedAlerts = false;
@@ -57,15 +64,12 @@ export function SecurityOperations() {
     setLoading(false);
   }
 
-
   useEffect(() => {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab]);
+  }, [tab, scope, selectedHost]);
 
-  // Re-fetch alerts when a realtime update comes in, so the table reflects
-  // what the worker just wrote to Mongo/Postgres (rather than re-deriving
-  // rows client-side from the pub/sub payload alone).
+  // Re-fetch alerts when a realtime update comes in
   useEffect(() => {
     if (updates.length > 0) load();
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -26,7 +26,7 @@ async def get_current_user(
         raise credentials_error
     try:
         payload = decode_token(token)
-        if payload.get("type") != "access":
+        if payload.get("type") not in ("access", "agent"):
             raise credentials_error
         user_id = uuid.UUID(payload["sub"])
     except (JWTError, KeyError, ValueError) as exc:

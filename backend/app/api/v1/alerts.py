@@ -21,9 +21,15 @@ async def list_alerts(
     offset: int = 0,
     severity: str | None = None,
     status: str | None = None,
+    scope: str = "personal",
+    host: str | None = None,
     user=Depends(get_current_user),
 ):
     query: dict = {}
+    if scope == "personal":
+        query["user_id"] = str(user.id)
+    if host:
+        query["$or"] = [{"hostname": host}, {"hostname": None}]
     if severity:
         query["severity"] = severity
     if status:
@@ -46,6 +52,8 @@ async def list_alerts(
                     "source_ip": doc.get("source_ip"),
                     "destination_ip": doc.get("destination_ip"),
                     "status": doc.get("status", "open"),
+                    "user_id": doc.get("user_id"),
+                    "hostname": doc.get("hostname"),
                     "created_at": doc.get("created_at"),
                 }
             )
@@ -63,10 +71,16 @@ async def list_incidents(
     limit: int = Query(default=50, le=200),
     offset: int = 0,
     status: str | None = None,
+    scope: str = "personal",
+    host: str | None = None,
     db: AsyncSession = Depends(get_db),
     user=Depends(get_current_user),
 ):
     stmt = select(Incident).order_by(Incident.updated_at.desc()).offset(offset).limit(limit)
+    if scope == "personal":
+        stmt = stmt.where(Incident.user_id == user.id)
+    if host:
+        stmt = stmt.where((Incident.hostname == host) | (Incident.hostname.is_(None)))
     if status:
         stmt = stmt.where(Incident.status == status)
     result = await db.execute(stmt)
@@ -80,6 +94,8 @@ async def list_incidents(
                 "status": i.status,
                 "risk_score": i.risk_score,
                 "alert_count": len(i.mongo_alert_ids or []),
+                "user_id": str(i.user_id) if i.user_id else None,
+                "hostname": i.hostname,
                 "created_at": i.created_at.isoformat(),
                 "updated_at": i.updated_at.isoformat(),
             }

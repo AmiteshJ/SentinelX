@@ -129,6 +129,9 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
             )
         )
 
+    user_id = event_doc.get("user_id")
+    hostname = event_doc.get("hostname") or (event_doc.get("raw", {}).get("hostname") if isinstance(event_doc.get("raw"), dict) else None)
+
     for rule in matched:
         alert_doc = {
             "event_id": event_id,
@@ -140,6 +143,8 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
             "destination_ip": event_doc.get("destination_ip"),
             "status": "open",
             "created_at": datetime.now(timezone.utc).isoformat(),
+            "user_id": user_id,
+            "hostname": hostname,
         }
         alert_mongo_id = "temp_alert_id"
         try:
@@ -151,10 +156,17 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
 
         async with AsyncSessionLocal() as db:
             source_ip = event_doc.get("source_ip", "unknown")
-            incident = await incident_repository.find_correlatable_incident(db, source_ip=source_ip)
+            incident = await incident_repository.find_correlatable_incident(
+                db, source_ip=source_ip, user_id=user_id, hostname=hostname
+            )
             if incident is None:
                 incident = await incident_repository.create_incident(
-                    db, source_ip=source_ip, severity=rule.severity, alert_mongo_id=alert_mongo_id
+                    db,
+                    source_ip=source_ip,
+                    severity=rule.severity,
+                    alert_mongo_id=alert_mongo_id,
+                    user_id=user_id,
+                    hostname=hostname,
                 )
             else:
                 incident = await incident_repository.append_alert_to_incident(
@@ -174,10 +186,12 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
                 "alert": {**alert_doc, "id": alert_mongo_id},
                 "incident_id": str(incident.id),
                 "incident_risk_score": risk_score,
+                "user_id": user_id,
+                "hostname": hostname,
             }
             await redis.publish(UPDATES_CHANNEL, json.dumps(update_payload, default=str))
 
-        logger.info("alert_generated", rule_id=rule.rule_id, source_ip=source_ip, risk_score=risk_score)
+        logger.info("alert_generated", rule_id=rule.rule_id, source_ip=source_ip, user_id=user_id, hostname=hostname, risk_score=risk_score)
 
 
 

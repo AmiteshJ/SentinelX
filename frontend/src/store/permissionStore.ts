@@ -15,10 +15,19 @@ export interface AgentDetails {
   last_seen?: number;
 }
 
+export interface EnrollmentData {
+  token: string;
+  email: string;
+  user_id: string;
+  command_windows: string;
+  command_python: string;
+}
+
 interface PermissionState {
   permissions: AgentPermissions;
   agentOnline: boolean;
   agentDetails: AgentDetails | null;
+  enrollment: EnrollmentData | null;
   hasConsented: boolean;
   isModalOpen: boolean;
   isLoading: boolean;
@@ -27,6 +36,7 @@ interface PermissionState {
   fetchPermissions: () => Promise<void>;
   updatePermissions: (perms: Partial<AgentPermissions>) => Promise<void>;
   fetchAgentStatus: () => Promise<void>;
+  fetchEnrollment: () => Promise<EnrollmentData | null>;
   startAgent: () => Promise<{ status: string; message?: string }>;
   giveConsentAndActivate: (perms: AgentPermissions) => Promise<void>;
   openModal: () => void;
@@ -44,9 +54,21 @@ export const usePermissionStore = create<PermissionState>((set, get) => ({
   },
   agentOnline: false,
   agentDetails: null,
+  enrollment: null,
   hasConsented: localStorage.getItem(CONSENT_KEY) === "true",
   isModalOpen: localStorage.getItem(CONSENT_KEY) !== "true",
   isLoading: false,
+
+  fetchEnrollment: async () => {
+    try {
+      const { data } = await apiClient.get<EnrollmentData>("/api/agent/enrollment");
+      set({ enrollment: data });
+      return data;
+    } catch (err) {
+      console.error("Failed to fetch enrollment", err);
+      return null;
+    }
+  },
 
   fetchPermissions: async () => {
     try {
@@ -56,6 +78,7 @@ export const usePermissionStore = create<PermissionState>((set, get) => ({
       console.error("Failed to load permissions", err);
     }
   },
+
 
   updatePermissions: async (patch: Partial<AgentPermissions>) => {
     const updated = { ...get().permissions, ...patch };
