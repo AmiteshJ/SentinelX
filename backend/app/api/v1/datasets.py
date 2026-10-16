@@ -50,7 +50,7 @@ async def get_stream_status(
 @router.post("/stream/start")
 async def start_stream(
     payload: StreamStartRequest,
-    _user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
+    user=Depends(require_role("admin", "soc_analyst", "security_manager", "viewer")),
 ):
     streamer = DatasetStreamer.get_instance()
     try:
@@ -58,6 +58,7 @@ async def start_stream(
             filename=payload.filename,
             speed_eps=payload.speed_eps,
             loop=payload.loop,
+            user_id=str(user.id) if user else None,
         )
         return status_info
     except FileNotFoundError as exc:

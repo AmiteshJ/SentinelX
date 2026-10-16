@@ -55,3 +55,18 @@ async def check_redis_health() -> bool:
         return await _redis.ping()
     except Exception:
         return False
+
+
+async def fast_forward_consumer_group() -> None:
+    """Fast-forwards the consumer group to the stream head ($) and acknowledges
+    any pending messages so that workers immediately ignore stale events."""
+    try:
+        r = get_redis()
+        await r.xgroup_setid(name=EVENTS_STREAM, groupname=EVENTS_CONSUMER_GROUP, id="$")
+        pending = await r.xpending_range(EVENTS_STREAM, EVENTS_CONSUMER_GROUP, min="-", max="+", count=500)
+        if pending:
+            ids = [p["message_id"] for p in pending]
+            await r.xack(EVENTS_STREAM, EVENTS_CONSUMER_GROUP, *ids)
+    except Exception:
+        pass
+

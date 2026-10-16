@@ -25,15 +25,16 @@ async def list_alerts(
     host: str | None = None,
     user=Depends(get_current_user),
 ):
-    query: dict = {}
+    conditions: list[dict] = []
     if scope == "personal":
-        query["user_id"] = str(user.id)
+        conditions.append({"$or": [{"user_id": str(user.id)}, {"user_id": None}, {"user_id": {"$exists": False}}]})
     if host:
-        query["$or"] = [{"hostname": host}, {"hostname": None}]
+        conditions.append({"$or": [{"hostname": host}, {"hostname": None}, {"hostname": {"$exists": False}}]})
     if severity:
-        query["severity"] = severity
+        conditions.append({"severity": severity})
     if status:
-        query["status"] = status
+        conditions.append({"status": status})
+    query = {"$and": conditions} if len(conditions) > 1 else (conditions[0] if conditions else {})
 
     alerts = []
     total = 0
@@ -78,7 +79,7 @@ async def list_incidents(
 ):
     stmt = select(Incident).order_by(Incident.updated_at.desc()).offset(offset).limit(limit)
     if scope == "personal":
-        stmt = stmt.where(Incident.user_id == user.id)
+        stmt = stmt.where((Incident.user_id == user.id) | (Incident.user_id.is_(None)))
     if host:
         stmt = stmt.where((Incident.hostname == host) | (Incident.hostname.is_(None)))
     if status:

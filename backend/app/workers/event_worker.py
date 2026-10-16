@@ -27,6 +27,7 @@ from app.db.postgres import AsyncSessionLocal
 from app.db.redis_client import (
     EVENTS_CONSUMER_GROUP,
     EVENTS_STREAM,
+    MODE_KEY,
     UPDATES_CHANNEL,
     close_redis,
     connect_redis,
@@ -37,6 +38,8 @@ from app.detection import rule_engine
 from app.repositories import incident_repository
 from app.repositories.rule_repository import load_enabled_rules
 from app.risk.risk_engine import compute_risk_score
+
+from app.services.dataset_service import clean_label
 
 logger = structlog.get_logger("event_worker")
 
@@ -67,6 +70,18 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
     redis = get_redis()
 
     event_doc = json.loads(raw_fields["payload"])
+    event_mode = str(event_doc.get("mode") or "").upper()
+
+    try:
+        current_system_mode = (await redis.get(MODE_KEY) or "OFFLINE").upper()
+    except Exception:
+        current_system_mode = "OFFLINE"
+
+    # If the user is currently monitoring live traffic (LIVE mode), discard any stale/backlog
+    # offline dataset replay events so they don't spam the live dashboard feed.
+    if current_system_mode == "LIVE" and event_mode == "DATASET":
+        return
+
     event_doc["ingested_at"] = datetime.now(timezone.utc).isoformat()
 
     event_id = "temp_id"
@@ -82,23 +97,32 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
 
     # If no Sigma rule explicitly matched but the dataset marked this as an attack class,
     # generate a high-fidelity alert with the appropriate MITRE ATT&CK technique & severity.
-    raw_label = str(event_doc.get("label") or "").strip()
+    raw_label = clean_label(event_doc.get("label") or "")
     if not matched and raw_label and raw_label.upper() != "BENIGN":
         lbl_lower = raw_label.lower()
         rule_name = f"Detected Threat: {raw_label}"
         severity = "medium"
         mitre_tech = "T1071"
-        rule_id = f"ML-{raw_label.replace(' ', '_').upper()}"
+        safe_rule_suffix = raw_label.replace(" ", "_").replace("-", "_").replace("/", "_").upper()
+        rule_id = f"ML-{safe_rule_suffix}"
 
         if "portscan" in lbl_lower:
             rule_name = "Network Service Scanning & Enumeration (PortScan)"
             severity = "high"
             mitre_tech = "T1046"
-        elif "slowloris" in lbl_lower or "dos" in lbl_lower or "ddos" in lbl_lower or "hulk" in lbl_lower:
+        elif "slowloris" in lbl_lower or "dos" in lbl_lower or "ddos" in lbl_lower or "hulk" in lbl_lower or "goldeneye" in lbl_lower:
             rule_name = f"Denial of Service Flooding ({raw_label})"
             severity = "critical"
             mitre_tech = "T1498"
-        elif "web attack" in lbl_lower or "xss" in lbl_lower or "sql" in lbl_lower:
+        elif "sql" in lbl_lower:
+            rule_name = "SQL Injection Application Exploit Attempt"
+            severity = "critical"
+            mitre_tech = "T1190"
+        elif "xss" in lbl_lower:
+            rule_name = "Cross-Site Scripting (XSS) Exploit Attempt"
+            severity = "critical"
+            mitre_tech = "T1190"
+        elif "web attack" in lbl_lower:
             rule_name = f"Web Application Exploit Attempt ({raw_label})"
             severity = "critical"
             mitre_tech = "T1190"
@@ -145,6 +169,7 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
             "created_at": datetime.now(timezone.utc).isoformat(),
             "user_id": user_id,
             "hostname": hostname,
+            "mode": event_mode or current_system_mode,
         }
         alert_mongo_id = "temp_alert_id"
         try:
@@ -188,11 +213,27 @@ async def _process_event(raw_fields: dict, rule_cache: RuleCache) -> None:
                 "incident_risk_score": risk_score,
                 "user_id": user_id,
                 "hostname": hostname,
+                "mode": event_mode or current_system_mode,
             }
             await redis.publish(UPDATES_CHANNEL, json.dumps(update_payload, default=str))
 
-        logger.info("alert_generated", rule_id=rule.rule_id, source_ip=source_ip, user_id=user_id, hostname=hostname, risk_score=risk_score)
+        try:
+            logger.info("alert_generated", rule_id=str(rule.rule_id), source_ip=str(source_ip), user_id=str(user_id or ""), hostname=str(hostname or ""), risk_score=float(risk_score))
+        except Exception:
+            pass
 
+
+
+async def _heartbeat_loop(redis) -> None:
+    """Refreshes heartbeat every 5s so dashboard reports detection engine as active."""
+    while True:
+        try:
+            await redis.set("sentinelx:worker:heartbeat", datetime.now(timezone.utc).isoformat(), ex=60)
+            await asyncio.sleep(5)
+        except asyncio.CancelledError:
+            break
+        except Exception:
+            await asyncio.sleep(5)
 
 
 async def run_worker() -> None:
@@ -203,12 +244,11 @@ async def run_worker() -> None:
     rule_cache = RuleCache()
 
     logger.info("event_worker_started")
+    hb_task = asyncio.create_task(_heartbeat_loop(redis))
+
     try:
         while True:
             try:
-                # Set heartbeat so dashboard reports detection engine as active/healthy
-                await redis.set("sentinelx:worker:heartbeat", datetime.now(timezone.utc).isoformat(), ex=15)
-
                 response = await redis.xreadgroup(
                     groupname=EVENTS_CONSUMER_GROUP,
                     consumername=CONSUMER_NAME,
@@ -231,11 +271,18 @@ async def run_worker() -> None:
                 for message_id, fields in messages:
                     try:
                         await _process_event(fields, rule_cache)
-                    except Exception:
-                        logger.exception("event_processing_failed", message_id=message_id)
+                    except Exception as err:
+                        try:
+                            logger.error("event_processing_failed", message_id=str(message_id), error=str(err))
+                        except Exception:
+                            pass
                     finally:
-                        await redis.xack(EVENTS_STREAM, EVENTS_CONSUMER_GROUP, message_id)
+                        try:
+                            await redis.xack(EVENTS_STREAM, EVENTS_CONSUMER_GROUP, message_id)
+                        except Exception:
+                            pass
     finally:
+        hb_task.cancel()
         close_mongo()
         await close_redis()
 

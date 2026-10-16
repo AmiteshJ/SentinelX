@@ -392,7 +392,7 @@ export function Dashboard() {
   const [data, setData] = useState<DashboardOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const { updates, connected } = useRealtimeUpdates();
+  const { updates, connected, clearUpdates } = useRealtimeUpdates();
   const { theme } = useTheme();
   const { scope, selectedHost } = useWorkspaceStore();
 
@@ -421,6 +421,15 @@ export function Dashboard() {
 
   const palette: Palette = useMemo(() => (theme === "dark" ? DARK_PALETTE : LIGHT_PALETTE), [theme]);
 
+  // Filter updates according to active system mode:
+  // In Online Live mode, exclude replay DATASET alerts so live feed is not polluted.
+  const displayedUpdates = useMemo(() => {
+    if (systemMode === "LIVE") {
+      return updates.filter((u) => (u.mode ?? u.alert?.mode) !== "DATASET");
+    }
+    return updates;
+  }, [updates, systemMode]);
+
   function refresh() {
     const params: Record<string, any> = { scope };
     if (selectedHost) params.host = selectedHost;
@@ -448,6 +457,7 @@ export function Dashboard() {
     try {
       await apiClient.post("/api/monitoring/mode", { mode: newMode });
       setSystemMode(newMode);
+      clearUpdates();
       refresh();
       useStreamStore.getState().fetchStatus();
     } catch {
@@ -931,90 +941,116 @@ export function Dashboard() {
             <Panel className="p-5 lg:col-span-3" glowOnHover={false} palette={palette}>
               <PanelHeader
                 icon={Activity}
-                title="Live Threat Feed"
+                title={systemMode === "LIVE" ? "Live Threat Feed (Online Stream)" : "Live Threat Feed (Replay Stream)"}
                 palette={palette}
                 right={
-                  <span
-                    className="flex items-center gap-1.5 font-mono text-[10px] tracking-wide"
-                    style={{ color: connected ? palette.live : palette.textMuted }}
-                  >
-                    {connected ? <Wifi size={12} /> : <WifiOff size={12} />}
-                    {connected ? "STREAM CONNECTED" : "DISCONNECTED"}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    {displayedUpdates.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={clearUpdates}
+                        className="text-[10px] text-slate-400 hover:text-slate-200 transition-colors underline cursor-pointer"
+                        title="Clear threat feed"
+                      >
+                        Clear Feed
+                      </button>
+                    )}
+                    <span
+                      className="flex items-center gap-1.5 font-mono text-[10px] tracking-wide"
+                      style={{ color: connected ? palette.live : palette.textMuted }}
+                    >
+                      {connected ? <Wifi size={12} /> : <WifiOff size={12} />}
+                      {connected ? "STREAM CONNECTED" : "DISCONNECTED"}
+                    </span>
+                  </div>
                 }
               />
-              {updates.length === 0 ? (
+              {displayedUpdates.length === 0 ? (
                 <p className="relative z-10 text-xs leading-relaxed" style={{ color: palette.textMuted }}>
-                  No alerts detected yet. Start dataset ingestion above to stream real attacks (PortScan, DoS, Web Attacks, etc.) and observe live detection in action.
+                  {systemMode === "LIVE"
+                    ? "Online monitoring active. Listening for real enterprise telemetry and live agent traffic on /api/events/ingest. No suspicious threats detected currently."
+                    : "No alerts detected yet. Start dataset ingestion above to stream real attacks (PortScan, DoS, Web Attacks, etc.) and observe live detection in action."}
                 </p>
               ) : (
                 <ul className="relative z-10 max-h-64 space-y-2 overflow-y-auto pr-1">
                   <AnimatePresence initial={false}>
-                    {updates.map((u, idx) => (
-                      <motion.li
-                        key={`${u.alert.id}-${idx}`}
-                        layout
-                        initial={{ opacity: 0, x: -12 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-xl border px-4 py-2.5 text-xs backdrop-blur-md"
-                        style={{
-                          borderColor:
-                            u.alert.severity === "critical"
-                              ? palette.criticalRing
-                              : u.alert.severity === "high"
-                              ? palette.highRing
-                              : palette.border,
-                          backgroundColor:
-                            u.alert.severity === "critical"
-                              ? palette.criticalBg
-                              : u.alert.severity === "high"
-                              ? palette.highBg
-                              : "rgba(255,255,255,0.015)",
-                        }}
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <span
-                            className="h-2 w-2 rounded-full"
-                            style={{
-                              backgroundColor:
-                                u.alert.severity === "critical"
-                                  ? palette.critical
-                                  : u.alert.severity === "high"
-                                  ? palette.high
-                                  : palette.medium,
-                            }}
-                          />
-                          <span className="font-semibold text-slate-100">{u.alert.rule_name}</span>
-                          {u.alert.mitre_technique && (
-                            <span className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">
-                              {u.alert.mitre_technique}
+                    {displayedUpdates.map((u, idx) => {
+                      const updateMode = (u.mode ?? u.alert?.mode)?.toUpperCase() ?? (systemMode === "LIVE" ? "LIVE" : "DATASET");
+                      return (
+                        <motion.li
+                          key={`${u.alert.id}-${idx}`}
+                          layout
+                          initial={{ opacity: 0, x: -12 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 rounded-xl border px-4 py-2.5 text-xs backdrop-blur-md"
+                          style={{
+                            borderColor:
+                              u.alert.severity === "critical"
+                                ? palette.criticalRing
+                                : u.alert.severity === "high"
+                                ? palette.highRing
+                                : palette.border,
+                            backgroundColor:
+                              u.alert.severity === "critical"
+                                ? palette.criticalBg
+                                : u.alert.severity === "high"
+                                ? palette.highBg
+                                : "rgba(255,255,255,0.015)",
+                          }}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <span
+                              className="h-2 w-2 rounded-full"
+                              style={{
+                                backgroundColor:
+                                  u.alert.severity === "critical"
+                                    ? palette.critical
+                                    : u.alert.severity === "high"
+                                    ? palette.high
+                                    : palette.medium,
+                              }}
+                            />
+                            <span className="font-semibold text-slate-100">{u.alert.rule_name}</span>
+                            <span
+                              className={`rounded px-1.5 py-0.5 font-mono text-[9px] font-semibold border ${
+                                updateMode === "LIVE"
+                                  ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/30"
+                                  : "bg-violet-500/20 text-violet-300 border-violet-500/30"
+                              }`}
+                            >
+                              {updateMode === "LIVE" ? "LIVE" : "REPLAY"}
                             </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-4 font-mono text-[11px]">
-                          <span className="text-slate-400">
-                            src: <span className="text-slate-200">{u.alert.source_ip || "unknown"}</span>
-                          </span>
-                          <span
-                            className="rounded-full px-2 py-0.5 font-semibold"
-                            style={{
-                              backgroundColor:
-                                (u.incident_risk_score ?? 0) >= 70
-                                  ? palette.criticalBg
-                                  : palette.primary,
-                              color:
-                                (u.incident_risk_score ?? 0) >= 70
-                                  ? palette.critical
-                                  : "#ffffff",
-                            }}
-                          >
-                            Risk {u.incident_risk_score ?? 0}/100
-                          </span>
-                        </div>
-                      </motion.li>
-                    ))}
+                            {u.alert.mitre_technique && (
+                              <span className="rounded bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] text-slate-400">
+                                {u.alert.mitre_technique}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-4 font-mono text-[11px]">
+                            <span className="text-slate-400">
+                              src: <span className="text-slate-200">{u.alert.source_ip || "unknown"}</span>
+                            </span>
+                            <span
+                              className="rounded-full px-2 py-0.5 font-semibold"
+                              style={{
+                                backgroundColor:
+                                  (u.incident_risk_score ?? 0) >= 70
+                                    ? palette.criticalBg
+                                    : palette.primary,
+                                color:
+                                  (u.incident_risk_score ?? 0) >= 70
+                                    ? palette.critical
+                                    : "#ffffff",
+                              }}
+                            >
+                              Risk {u.incident_risk_score ?? 0}/100
+                            </span>
+                          </div>
+                        </motion.li>
+                      );
+                    })}
                   </AnimatePresence>
                 </ul>
               )}

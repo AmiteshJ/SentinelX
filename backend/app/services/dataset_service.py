@@ -132,6 +132,45 @@ def _derive_ips(label_str: str, row_idx: int) -> tuple[str, str]:
         return (f"192.168.10.{src_host}", f"192.168.10.{dst_host}")
 
 
+def clean_label(val: any) -> str:
+    """Normalize corrupted/latin1 character artifacts (like \\ufffd or \\x96 in CIC-IDS) into clean ASCII."""
+    if val is None or pd.isna(val):
+        return "BENIGN"
+    s = str(val).strip()
+    s = s.replace("\ufffd", " - ").replace("\x96", " - ").replace("\u2013", " - ")
+    s = " ".join(s.split())
+    sl = s.lower()
+    if "brute force" in sl and "web" in sl:
+        return "Web Attack - Brute Force"
+    if "xss" in sl:
+        return "Web Attack - XSS"
+    if "sql" in sl:
+        return "Web Attack - SQL Injection"
+    if "portscan" in sl:
+        return "PortScan"
+    if "slowloris" in sl:
+        return "DoS Slowloris"
+    if "hulk" in sl:
+        return "DoS Hulk"
+    if "goldeneye" in sl:
+        return "DoS GoldenEye"
+    if "ddos" in sl:
+        return "DDoS Flooding"
+    if "dos" in sl:
+        return "DoS Flooding"
+    if "patator" in sl or ("ssh" in sl and "patator" in sl) or ("ftp" in sl and "patator" in sl):
+        return "Brute Force (Patator)"
+    if "infilt" in sl:
+        return "Infiltration"
+    if "bot" in sl:
+        return "Botnet C2"
+    if "heartbleed" in sl:
+        return "Heartbleed Exploit"
+    ascii_clean = "".join(c if (c.isascii() and c.isprintable()) else " " for c in s)
+    res = " ".join(ascii_clean.split())
+    return res if res else "BENIGN"
+
+
 def to_events(df: pd.DataFrame) -> Iterator[EventIn]:
     """Yields validated EventIn rows. Supports both raw packet CSVs with explicit IPs
     and CIC-IDS 2017 flow CSVs by resolving or synthesizing appropriate SOC IPs.
@@ -154,7 +193,7 @@ def to_events(df: pd.DataFrame) -> Iterator[EventIn]:
                     else:
                         extra[c] = v
 
-        raw_label = str(row[resolved["label"]]) if resolved["label"] and pd.notna(row[resolved["label"]]) else "BENIGN"
+        raw_label = clean_label(row[resolved["label"]]) if resolved["label"] and pd.notna(row[resolved["label"]]) else "BENIGN"
         derived_src, derived_dst = _derive_ips(raw_label, idx)
 
         src_ip = str(row[source_ip_col]) if source_ip_col and pd.notna(row[source_ip_col]) else derived_src

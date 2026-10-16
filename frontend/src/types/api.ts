@@ -56,6 +56,7 @@ export interface Alert {
   user_id?: string | null;
   hostname?: string | null;
   created_at: string;
+  mode?: "LIVE" | "DATASET" | "REPLAY" | "OFFLINE" | string;
 }
 
 export interface Incident {
@@ -76,6 +77,9 @@ export interface RealtimeUpdate {
   alert: Alert;
   incident_id: string;
   incident_risk_score: number;
+  user_id?: string | null;
+  hostname?: string | null;
+  mode?: "LIVE" | "DATASET" | "REPLAY" | "OFFLINE" | string;
 }
 
 export interface MaliciousUrl {

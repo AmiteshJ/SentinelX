@@ -14,8 +14,8 @@ from typing import Any, Optional
 import pandas as pd
 import structlog
 
-from app.db.redis_client import EVENTS_STREAM, MODE_KEY, get_redis
-from app.services.dataset_service import _normalize_headers, to_events
+from app.db.redis_client import EVENTS_STREAM, MODE_KEY, fast_forward_consumer_group, get_redis
+from app.services.dataset_service import _normalize_headers, clean_label, to_events
 
 logger = structlog.get_logger("dataset_streamer")
 
@@ -59,6 +59,7 @@ class DatasetStreamer:
         self.total_rows_estimate: int = 0
         self.current_label: Optional[str] = None
         self.active_mode: str = "OFFLINE"
+        self.user_id: Optional[str] = None
         self._task: Optional[asyncio.Task] = None
         self._pause_event = asyncio.Event()
         self._pause_event.set()
@@ -83,21 +84,39 @@ class DatasetStreamer:
         results = []
         for file_path in sorted(csv_files, key=lambda p: p.name):
             size_bytes = file_path.stat().st_size
-            categories = []
+            categories_set: set[str] = set()
             try:
-                # Fast sample preview of label column
-                sample_df = pd.read_csv(file_path, nrows=200)
-                norm_cols = [c.strip().lower() for c in sample_df.columns]
-                label_idx = None
-                for idx, col in enumerate(norm_cols):
-                    if "label" in col or "attack" in col or "class" in col:
-                        label_idx = idx
+                # Fast sample preview of label column across chunks
+                for chunk in pd.read_csv(file_path, chunksize=2500, nrows=10000, low_memory=False, encoding="latin1"):
+                    norm_cols = [c.strip().lower() for c in chunk.columns]
+                    label_idx = None
+                    for idx, col in enumerate(norm_cols):
+                        if "label" in col or "attack" in col or "class" in col:
+                            label_idx = idx
+                            break
+                    if label_idx is not None:
+                        raw_cats = chunk.iloc[:, label_idx].dropna().unique().tolist()
+                        for c in raw_cats:
+                            categories_set.add(clean_label(str(c)))
+                    if len(categories_set) > 3:
                         break
-                if label_idx is not None:
-                    raw_cats = sample_df.iloc[:, label_idx].dropna().unique().tolist()
-                    categories = [str(c).strip() for c in raw_cats]
             except Exception:
-                categories = []
+                pass
+
+            # If it's the known CIC-IDS Thursday WebAttacks file, ensure Web Attacks are noted
+            if "webattacks" in file_path.name.lower():
+                categories_set.add("BENIGN")
+                categories_set.add("Web Attack - Brute Force")
+                categories_set.add("Web Attack - XSS")
+                categories_set.add("Web Attack - SQL Injection")
+            elif "portscan" in file_path.name.lower():
+                categories_set.add("BENIGN")
+                categories_set.add("PortScan")
+            elif "dos" in file_path.name.lower() or "slowloris" in file_path.name.lower():
+                categories_set.add("BENIGN")
+                categories_set.add("DoS Slowloris")
+
+            categories = sorted(list(categories_set)) if categories_set else ["BENIGN"]
 
             results.append({
                 "filename": file_path.name,
@@ -121,13 +140,14 @@ class DatasetStreamer:
             "active_mode": self.active_mode,
         }
 
-    async def start(self, filename: str, speed_eps: int = 10, loop: bool = True) -> dict[str, Any]:
+    async def start(self, filename: str, speed_eps: int = 10, loop: bool = True, user_id: Optional[str] = None) -> dict[str, Any]:
         ds_dir = get_datasets_dir()
         file_path = ds_dir / filename
         if not file_path.exists():
             raise FileNotFoundError(f"Dataset file '{filename}' not found in {ds_dir}")
 
         await self.stop()
+        await fast_forward_consumer_group()
 
         self.current_filename = filename
         self.speed_eps = max(1, min(speed_eps, 100))
@@ -136,6 +156,7 @@ class DatasetStreamer:
         self.is_running = True
         self.is_paused = False
         self.active_mode = "DATASET"
+        self.user_id = user_id
         self._pause_event.set()
 
         try:
@@ -145,7 +166,7 @@ class DatasetStreamer:
             logger.warning("failed_to_set_redis_mode", error=str(exc))
 
         self._task = asyncio.create_task(self._stream_loop(file_path))
-        logger.info("dataset_streaming_started", file=filename, speed=self.speed_eps)
+        logger.info("dataset_streaming_started", file=filename, speed=self.speed_eps, user_id=user_id)
         return self.get_status()
 
     async def pause(self) -> dict[str, Any]:
@@ -191,6 +212,9 @@ class DatasetStreamer:
         except Exception as exc:
             logger.warning("failed_to_set_redis_mode_offline", error=str(exc))
 
+        # Clear any remaining queued events from the stream so workers do not process old dataset events
+        await fast_forward_consumer_group()
+
         logger.info("dataset_streaming_stopped", total_ingested=self.events_ingested)
         return self.get_status()
 
@@ -210,13 +234,30 @@ class DatasetStreamer:
         except Exception as exc:
             logger.warning("failed_to_set_redis_mode", error=str(exc))
 
+        if clean_mode != "DATASET":
+            await fast_forward_consumer_group()
+
         return self.get_status()
 
     async def _stream_loop(self, file_path: Path) -> None:
         chunk_size = 200
+        # If user selected the raw full 52MB CIC-IDS Thursday file, start right before the attack block
+        # (row 12,625) so 10-15 benign packets play first, then real attacks trigger immediately!
+        skiprows_arg = None
+        if "webattacks.pcap_iscx" in file_path.name.lower():
+            skiprows_arg = range(1, 12625)
+
         while self.is_running:
             try:
-                for chunk in pd.read_csv(file_path, chunksize=chunk_size, low_memory=False):
+                csv_kwargs = {
+                    "chunksize": chunk_size,
+                    "low_memory": False,
+                    "encoding": "latin1",
+                }
+                if skiprows_arg:
+                    csv_kwargs["skiprows"] = skiprows_arg
+
+                for chunk in pd.read_csv(file_path, **csv_kwargs):
                     if not self.is_running:
                         break
 
@@ -235,6 +276,8 @@ class DatasetStreamer:
 
                         event_dict = event.model_dump(mode="json")
                         event_dict["mode"] = "DATASET"
+                        if self.user_id:
+                            event_dict["user_id"] = self.user_id
                         self.current_label = event.label
 
                         await redis.xadd(EVENTS_STREAM, {"payload": json.dumps(event_dict)})

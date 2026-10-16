@@ -44,7 +44,7 @@ async def overview(
             return 0
         try:
             if scope == "personal":
-                query_str = "SELECT count(*) FROM incidents WHERE status != 'closed' AND user_id = :uid"
+                query_str = "SELECT count(*) FROM incidents WHERE status != 'closed' AND (user_id = :uid OR user_id IS NULL)"
                 params = {"uid": user.id}
                 if host:
                     query_str += " AND (hostname = :host OR hostname IS NULL)"
@@ -68,12 +68,14 @@ async def overview(
         try:
             mongo_db = get_mongo_db()
             async def get_count(s: str):
-                f: dict = {"severity": s, "status": "open"}
+                conditions: list[dict] = [{"severity": s, "status": "open"}]
                 if scope == "personal":
-                    f["user_id"] = str(user.id)
+                    conditions.append({"$or": [{"user_id": str(user.id)}, {"user_id": None}, {"user_id": {"$exists": False}}]})
                 if host:
-                    f["$or"] = [{"hostname": host}, {"hostname": None}]
-                return await mongo_db.alerts.count_documents(f)
+                    conditions.append({"$or": [{"hostname": host}, {"hostname": None}, {"hostname": {"$exists": False}}]})
+
+                query_filter = {"$and": conditions} if len(conditions) > 1 else conditions[0]
+                return await mongo_db.alerts.count_documents(query_filter)
 
             results = await asyncio.gather(*[
                 get_count(s) for s in ["critical", "high", "medium", "low"]

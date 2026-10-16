@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useAuthStore } from "../store/authStore";
 import type { RealtimeUpdate } from "../types/api";
 
@@ -16,6 +16,10 @@ export function useRealtimeUpdates(maxBuffer = 25) {
   const [updates, setUpdates] = useState<RealtimeUpdate[]>([]);
   const [connected, setConnected] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
+
+  const clearUpdates = useCallback(() => {
+    setUpdates([]);
+  }, []);
 
   useEffect(() => {
     if (!accessToken) return;
@@ -57,5 +61,5 @@ export function useRealtimeUpdates(maxBuffer = 25) {
     };
   }, [accessToken, maxBuffer]);
 
-  return { updates, connected };
+  return { updates, connected, clearUpdates };
 }
