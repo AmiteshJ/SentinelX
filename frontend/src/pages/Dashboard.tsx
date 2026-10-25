@@ -32,6 +32,7 @@ import {
 import { Link, useSearchParams } from "react-router-dom";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { GraphCorrelationModal } from "../components/graph/GraphCorrelationModal";
+import { ThreatOverviewModal } from "../components/dashboard/ThreatOverviewModal";
 import { apiClient } from "../api/client";
 import { useRealtimeUpdates } from "../hooks/useRealtimeUpdates";
 import { useTheme } from "../theme/ThemeProvider";
@@ -89,49 +90,49 @@ const DARK_PALETTE = {
 };
 
 const LIGHT_PALETTE = {
-  pageBg: "#FAF9FF",
-  gradientOverlay: "linear-gradient(180deg,#FDFCFF 0%,#FAF9FF 55%,#F5F3FF 100%)",
-  blob1: "rgba(124,58,237,0.10)",
-  blob2: "rgba(167,139,250,0.12)",
-  blob3: "rgba(196,181,253,0.20)",
-  radarColor: "#7C3AED",
-  radarOpacity: 0.07,
-  text: "#18181B",
-  textSecondary: "#71717A",
-  textMuted: "#A1A1AA",
+  pageBg: "#FFF5E6",
+  gradientOverlay: "linear-gradient(180deg,#FEFBF4 0%,#FFF5E6 55%,#FDF3E3 100%)",
+  blob1: "rgba(250,135,117,0.22)",
+  blob2: "rgba(157,133,242,0.18)",
+  blob3: "rgba(85,117,112,0.14)",
+  radarColor: "#FA8775",
+  radarOpacity: 0.08,
+  text: "#282937",
+  textSecondary: "#4A4B5E",
+  textMuted: "#58565E",
   surface: "#FFFFFF",
-  surfaceHover: "#FCFAFF",
-  border: "#E9E7F2",
-  borderHover: "rgba(124,58,237,0.35)",
-  primary: "#7C3AED",
-  primaryGlow: "#A78BFA",
-  hairline: "rgba(124,58,237,0.14)",
-  shadowGlow: "rgba(124,58,237,0.18)",
-  panelShadow: "rgba(124,58,237,0.12)",
-  skeleton: "rgba(124,58,237,0.05)",
-  eyebrow: "#7C3AED",
-  live: "#16A34A",
-  replay: "#7C3AED",
-  offlineDot: "#A1A1AA",
-  critical: "#F43F5E",
-  criticalBg: "rgba(244,63,94,0.10)",
-  criticalRing: "rgba(244,63,94,0.22)",
-  high: "#EA580C",
-  highBg: "rgba(234,88,12,0.10)",
-  highRing: "rgba(234,88,12,0.22)",
-  medium: "#D97706",
-  mediumBg: "rgba(217,119,6,0.10)",
-  mediumRing: "rgba(217,119,6,0.22)",
-  low: "#7C3AED",
-  lowBg: "rgba(124,58,237,0.10)",
-  lowRing: "rgba(124,58,237,0.22)",
-  errorBg: "rgba(244,63,94,0.08)",
-  errorBorder: "rgba(244,63,94,0.30)",
-  errorText: "#E11D48",
-  ringColor: "rgba(124,58,237,0.40)",
-  ringDim: "rgba(161,161,170,0.55)",
-  cometColor: "#7C3AED",
-  cometRing: "rgba(124,58,237,0.35)",
+  surfaceHover: "#FEFBF4",
+  border: "#E2D9CC",
+  borderHover: "rgba(250,135,117,0.50)",
+  primary: "#282937",
+  primaryGlow: "#FA8775",
+  hairline: "rgba(40,41,55,0.08)",
+  shadowGlow: "rgba(250,135,117,0.22)",
+  panelShadow: "rgba(40,41,55,0.07)",
+  skeleton: "rgba(40,41,55,0.05)",
+  eyebrow: "#802D3A",
+  live: "#15803D",
+  replay: "#9D85F2",
+  offlineDot: "#6E7085",
+  critical: "#BE123C",
+  criticalBg: "rgba(190,18,60,0.12)",
+  criticalRing: "rgba(190,18,60,0.26)",
+  high: "#FA8775",
+  highBg: "rgba(250,135,117,0.14)",
+  highRing: "rgba(250,135,117,0.28)",
+  medium: "#B45309",
+  mediumBg: "rgba(180,83,9,0.14)",
+  mediumRing: "rgba(180,83,9,0.28)",
+  low: "#5B4080",
+  lowBg: "rgba(91,64,128,0.12)",
+  lowRing: "rgba(91,64,128,0.24)",
+  errorBg: "rgba(190,18,60,0.10)",
+  errorBorder: "rgba(190,18,60,0.30)",
+  errorText: "#BE123C",
+  ringColor: "rgba(250,135,117,0.45)",
+  ringDim: "rgba(110,112,133,0.50)",
+  cometColor: "#FA8775",
+  cometRing: "rgba(250,135,117,0.40)",
 };
 
 type Palette = typeof DARK_PALETTE;
@@ -219,7 +220,10 @@ function Panel({
       style={{
         backgroundColor: palette.surface,
         borderColor: palette.border,
-        boxShadow: `0 20px 60px -24px ${palette.panelShadow}`,
+        boxShadow:
+          palette === DARK_PALETTE
+            ? `0 20px 60px -24px ${palette.panelShadow}`
+            : "0 1px 3px rgba(40,41,55,0.05), 0 6px 20px -2px rgba(40,41,55,0.07)",
       }}
       className={`relative overflow-hidden rounded-[28px] border backdrop-blur-xl transition-colors duration-300 ${className}`}
     >
@@ -412,6 +416,7 @@ export function Dashboard() {
   const [systemMode, setSystemMode] = useState<string>("OFFLINE");
   const [searchParams, setSearchParams] = useSearchParams();
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
+  const [selectedThreatSeverity, setSelectedThreatSeverity] = useState<"critical" | "high" | "medium" | "low" | null>(null);
 
   useEffect(() => {
     if (searchParams.get("view") === "correlation" || searchParams.get("graph") === "open") {
@@ -539,29 +544,43 @@ export function Dashboard() {
             </button>
 
             {/* Mode Switch Toggle Pill */}
-            <div className="flex items-center gap-2 rounded-2xl border p-1.5 shadow-lg backdrop-blur-md" style={{ borderColor: palette.border, backgroundColor: palette.surface }}>
+            <div
+              className={`flex items-center gap-2 rounded-2xl border p-1.5 backdrop-blur-md transition-all ${
+                theme === "dark"
+                  ? "border-slate-800 bg-[#070c18]/90 shadow-lg"
+                  : "border-[#E2D9CC] bg-white shadow-[0_2px_12px_rgba(40,41,55,0.08)]"
+              }`}
+            >
               <button
                 onClick={() => handleToggleMode("OFFLINE")}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   systemMode !== "LIVE"
-                    ? "bg-slate-800/90 text-white shadow-md border border-slate-700/60"
-                    : "text-slate-400 hover:text-white"
+                    ? theme === "dark"
+                      ? "bg-slate-800/90 text-white shadow-md border border-slate-700/60"
+                      : "bg-[#282937] text-[#FFF5E6] shadow-[0_2px_8px_rgba(40,41,55,0.2)] border border-[#282937]"
+                    : theme === "dark"
+                      ? "text-slate-400 hover:text-white"
+                      : "text-[#6E7085] hover:text-[#282937] hover:bg-[#F8F4EC]"
                 }`}
               >
-                <span className={`h-2 w-2 rounded-full ${isStreaming ? "bg-cyan-400 animate-pulse" : "bg-slate-400"}`} />
+                <span className={`h-2 w-2 rounded-full ${isStreaming ? "bg-cyan-400 animate-pulse" : (theme === "dark" ? "bg-slate-400" : "bg-[#FA8775]")}`} />
                 Offline Demo / Ingestion
               </button>
               <button
                 onClick={() => handleToggleMode("LIVE")}
-                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-medium transition-all ${
+                className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                   systemMode === "LIVE"
-                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.3)]"
-                    : "text-slate-400 hover:text-white"
+                    ? theme === "dark"
+                      ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-[0_0_12px_rgba(52,211,153,0.3)]"
+                      : "bg-[#15803D] text-white border border-[#15803D] shadow-[0_2px_10px_rgba(21,128,61,0.25)]"
+                    : theme === "dark"
+                      ? "text-slate-400 hover:text-white"
+                      : "text-[#6E7085] hover:text-[#282937] hover:bg-[#F8F4EC]"
                 }`}
               >
                 <span className="relative flex h-2 w-2">
                   {systemMode === "LIVE" && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
-                  <span className={`relative inline-flex h-2 w-2 rounded-full ${systemMode === "LIVE" ? "bg-emerald-400" : "bg-slate-500"}`} />
+                  <span className={`relative inline-flex h-2 w-2 rounded-full ${systemMode === "LIVE" ? (theme === "dark" ? "bg-emerald-400" : "bg-white") : "bg-slate-400"}`} />
                 </span>
                 Online Live Data
               </button>
@@ -675,10 +694,10 @@ export function Dashboard() {
                     value={selectedFile}
                     onChange={(e) => setSelectedFile(e.target.value)}
                     disabled={isStreaming || isPaused}
-                    className="w-full rounded-xl border border-slate-700/70 bg-slate-900/90 px-3.5 py-2 text-xs text-slate-200 shadow-inner focus:border-sx-blue focus:outline-none disabled:opacity-60 transition-colors"
+                    className="w-full rounded-xl border border-slate-700/80 bg-[#0b111e] px-3.5 py-2 text-xs text-slate-100 shadow-inner focus:border-sx-blue focus:outline-none disabled:opacity-60 transition-colors cursor-pointer"
                   >
                     {datasetFiles.map((f) => (
-                      <option key={f.filename} value={f.filename}>
+                      <option key={f.filename} value={f.filename} className="bg-[#0b111e] text-slate-200">
                         {formatDatasetName(f.filename)} ({f.size_formatted})
                       </option>
                     ))}
@@ -907,7 +926,12 @@ export function Dashboard() {
 
             {/* Threat Overview */}
             <Panel className="p-5 lg:col-span-3" glowOnHover={false} palette={palette}>
-              <PanelHeader icon={AlertTriangle} title="Threat Overview" palette={palette} />
+              <div className="flex items-center justify-between mb-4">
+                <PanelHeader icon={AlertTriangle} title="Threat Overview" palette={palette} />
+                <span className="text-[11px] font-mono text-slate-400">
+                  Click any tier to view count justification &amp; breakdown
+                </span>
+              </div>
               <div className="relative z-10 grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {(
                   [
@@ -917,22 +941,35 @@ export function Dashboard() {
                     ["low", data.low_alerts, Info, palette.low, palette.lowBg, palette.lowRing],
                   ] as const
                 ).map(([severity, count, SevIcon, color, bg, ring]) => (
-                  <div
+                  <button
                     key={severity}
-                    className="relative flex items-center gap-3 overflow-hidden rounded-2xl border px-4 py-3.5"
+                    type="button"
+                    onClick={() => setSelectedThreatSeverity(severity)}
+                    className="group relative flex items-center justify-between overflow-hidden rounded-2xl border px-4 py-3.5 text-left transition-all duration-200 hover:scale-[1.025] hover:shadow-[0_0_24px_rgba(0,0,0,0.6)] active:scale-[0.98] cursor-pointer"
                     style={{ borderColor: ring, background: `linear-gradient(135deg, ${bg} 0%, transparent 70%)` }}
+                    title={`Click to view ${severity} threat justification and telemetry breakdown`}
                   >
-                    <span
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border"
-                      style={{ borderColor: ring, backgroundColor: bg }}
-                    >
-                      <SevIcon size={18} style={{ color }} />
-                    </span>
-                    <div>
-                      <AnimatedNumber value={count} className="block font-mono text-xl font-semibold tabular-nums" color={color} />
-                      <span className="text-[10px] uppercase tracking-wide" style={{ color: palette.textMuted }}>{severity}</span>
+                    <div className="flex items-center gap-3">
+                      <span
+                        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border group-hover:scale-110 transition-transform shadow-md"
+                        style={{ borderColor: ring, backgroundColor: bg }}
+                      >
+                        <SevIcon size={18} style={{ color }} />
+                      </span>
+                      <div>
+                        <AnimatedNumber value={count} className="block font-mono text-xl font-semibold tabular-nums" color={color} />
+                        <span className="text-[10px] uppercase tracking-wide font-semibold" style={{ color: palette.textMuted }}>{severity}</span>
+                      </div>
                     </div>
-                  </div>
+                    <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span
+                        className="flex h-6 w-6 items-center justify-center rounded-xl border text-xs shadow"
+                        style={{ borderColor: ring, color }}
+                      >
+                        <ArrowRight size={12} />
+                      </span>
+                    </div>
+                  </button>
                 ))}
               </div>
             </Panel>
@@ -1067,6 +1104,24 @@ export function Dashboard() {
             setSearchParams({});
           }
         }}
+      />
+
+      <ThreatOverviewModal
+        isOpen={selectedThreatSeverity !== null}
+        onClose={() => setSelectedThreatSeverity(null)}
+        severity={selectedThreatSeverity}
+        count={
+          selectedThreatSeverity === "critical"
+            ? (data?.critical_alerts ?? 0)
+            : selectedThreatSeverity === "high"
+            ? (data?.high_alerts ?? 0)
+            : selectedThreatSeverity === "medium"
+            ? (data?.medium_alerts ?? 0)
+            : (data?.low_alerts ?? 0)
+        }
+        scope={scope}
+        selectedHost={selectedHost}
+        onOpenGraph={() => setIsGraphModalOpen(true)}
       />
     </>
   );

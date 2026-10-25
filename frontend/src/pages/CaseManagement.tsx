@@ -42,18 +42,18 @@ import type { Case, Report } from "../types/api";
 const STATUSES = ["open", "investigating", "contained", "resolved", "closed"] as const;
 
 const STATUS_BADGE: Record<string, { label: string; bg: string; text: string; border: string }> = {
-  open: { label: "Open", bg: "bg-blue-500/10", text: "text-blue-400", border: "border-blue-500/30" },
-  investigating: { label: "Investigating", bg: "bg-amber-500/10", text: "text-amber-400", border: "border-amber-500/30" },
-  contained: { label: "Contained", bg: "bg-purple-500/10", text: "text-purple-400", border: "border-purple-500/30" },
-  resolved: { label: "Resolved", bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/30" },
-  closed: { label: "Closed", bg: "bg-slate-500/10", text: "text-slate-400", border: "border-slate-500/30" },
+  open: { label: "Open", bg: "bg-blue-500/10", text: "text-blue-700 dark:text-blue-400 font-semibold", border: "border-blue-500/30" },
+  investigating: { label: "Investigating", bg: "bg-amber-500/10", text: "text-amber-800 dark:text-amber-400 font-semibold", border: "border-amber-500/30" },
+  contained: { label: "Contained", bg: "bg-purple-500/10", text: "text-purple-800 dark:text-purple-400 font-semibold", border: "border-purple-500/30" },
+  resolved: { label: "Resolved", bg: "bg-emerald-500/10", text: "text-emerald-800 dark:text-emerald-400 font-semibold", border: "border-emerald-500/30" },
+  closed: { label: "Closed", bg: "bg-slate-500/10", text: "text-slate-700 dark:text-slate-400 font-semibold", border: "border-slate-500/30" },
 };
 
 const SEVERITY_BADGE: Record<string, { bg: string; text: string; border: string }> = {
-  critical: { bg: "bg-red-500/10", text: "text-red-400", border: "border-red-500/30" },
-  high: { bg: "bg-orange-500/10", text: "text-orange-400", border: "border-orange-500/30" },
-  medium: { bg: "bg-yellow-500/10", text: "text-yellow-400", border: "border-yellow-500/30" },
-  low: { bg: "bg-emerald-500/10", text: "text-emerald-400", border: "border-emerald-500/30" },
+  critical: { bg: "bg-red-500/10", text: "text-red-700 dark:text-red-400 font-bold", border: "border-red-500/30" },
+  high: { bg: "bg-orange-500/10", text: "text-orange-800 dark:text-orange-400 font-bold", border: "border-orange-500/30" },
+  medium: { bg: "bg-yellow-500/10", text: "text-amber-800 dark:text-yellow-400 font-bold", border: "border-yellow-500/30" },
+  low: { bg: "bg-emerald-500/10", text: "text-emerald-800 dark:text-emerald-400 font-bold", border: "border-emerald-500/30" },
 };
 
 interface IncidentSummary {
@@ -326,20 +326,20 @@ export function CaseManagement() {
     <DashboardShell>
       <div className="space-y-6 pb-12">
         {/* Header Hero */}
-        <div className="relative overflow-hidden rounded-[28px] border border-slate-800/80 bg-gradient-to-r from-[#0c1424] via-[#09101d] to-[#050811] p-6 shadow-2xl">
+        <div className="relative overflow-hidden rounded-[28px] border border-[#e2d9cc] dark:border-slate-800/80 bg-white/95 dark:bg-gradient-to-r dark:from-[#0c1424] dark:via-[#09101d] dark:to-[#050811] p-6 shadow-[0_4px_24px_rgba(40,41,55,0.06)] dark:shadow-2xl">
           <div className="pointer-events-none absolute top-0 right-0 h-96 w-96 rounded-full bg-blue-500/10 blur-[120px]" />
           <div className="pointer-events-none absolute bottom-0 left-1/3 h-64 w-64 rounded-full bg-purple-500/10 blur-[100px]" />
 
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
             <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-400">
-                <Briefcase size={14} className="text-blue-400" />
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1 text-xs font-semibold text-blue-600 dark:text-blue-400">
+                <Briefcase size={14} className="text-blue-600 dark:text-blue-400" />
                 <span>Unified SOC Operations Workspace</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#282937] dark:text-white">
                 Case Management &amp; Security Reports
               </h1>
-              <p className="max-w-2xl text-xs sm:text-sm text-slate-400">
+              <p className="max-w-2xl text-xs sm:text-sm text-[#4a4b5e] dark:text-slate-400">
                 Seamlessly coordinate analyst investigations, inspect incident origins &amp; root causes, and generate automated AI executive summaries from real telemetry.
               </p>
             </div>
@@ -358,9 +358,9 @@ export function CaseManagement() {
               <button
                 type="button"
                 onClick={() => setShowReportModal(true)}
-                className="flex items-center gap-2 rounded-xl border border-purple-500/40 bg-purple-500/15 px-4 py-2.5 text-xs font-semibold text-purple-300 hover:bg-purple-500/25 active:scale-95 transition-all cursor-pointer shadow-[0_0_15px_rgba(168,85,247,0.2)]"
+                className="flex items-center gap-2 rounded-xl border border-purple-500/40 bg-purple-500/15 px-4 py-2.5 text-xs font-semibold text-purple-700 dark:text-purple-300 hover:bg-purple-500/25 active:scale-95 transition-all cursor-pointer shadow-[0_0_15px_rgba(168,85,247,0.2)]"
               >
-                <Sparkles size={15} className="text-purple-300" />
+                <Sparkles size={15} className="text-purple-600 dark:text-purple-300" />
                 <span>Generate Report</span>
               </button>
 
@@ -369,9 +369,9 @@ export function CaseManagement() {
                 onClick={loadData}
                 disabled={loading}
                 title="Refresh All"
-                className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-700/80 bg-slate-900/80 text-slate-300 hover:bg-slate-800 hover:text-white transition-colors cursor-pointer"
+                className="flex h-9 w-9 items-center justify-center rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-slate-900/80 text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-slate-800 hover:text-[#282937] dark:hover:text-white transition-colors cursor-pointer shadow-xs"
               >
-                <RefreshCw size={14} className={loading ? "animate-spin text-blue-400" : ""} />
+                <RefreshCw size={14} className={loading ? "animate-spin text-blue-600 dark:text-blue-400" : ""} />
               </button>
             </div>
           </div>
@@ -382,41 +382,41 @@ export function CaseManagement() {
           {/* Total Cases */}
           <div
             onClick={() => setActiveTab("cases")}
-            className="rounded-2xl border border-slate-800/80 bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-blue-500/40 transition-colors"
+            className="rounded-2xl border border-[#E2D9CC] dark:border-slate-800/80 bg-white/95 dark:bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-blue-500/40 transition-all shadow-[0_2px_12px_rgba(40,41,55,0.06)]"
           >
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-[#6E7085] dark:text-slate-400">
               <span className="text-[11px] font-semibold uppercase tracking-wider">Total Cases</span>
-              <Briefcase size={16} className="text-blue-400" />
+              <Briefcase size={16} className="text-blue-500 dark:text-blue-400" />
             </div>
-            <div className="mt-2 text-2xl font-bold font-mono text-white">{cases.length}</div>
-            <div className="mt-1 text-[11px] text-slate-400 flex items-center gap-1.5">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <div className="mt-2 text-2xl font-bold font-mono text-[#282937] dark:text-white">{cases.length}</div>
+            <div className="mt-1 text-[11px] text-[#6E7085] dark:text-slate-400 flex items-center gap-1.5">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500 dark:bg-blue-400" />
               <span>{openCasesCount} active in triage</span>
             </div>
           </div>
 
           {/* Critical Priority */}
-          <div className="rounded-2xl border border-slate-800/80 bg-[#070c18]/80 p-4 backdrop-blur-md">
-            <div className="flex items-center justify-between text-slate-400">
+          <div className="rounded-2xl border border-[#E2D9CC] dark:border-slate-800/80 bg-white/95 dark:bg-[#070c18]/80 p-4 backdrop-blur-md shadow-[0_2px_12px_rgba(40,41,55,0.06)]">
+            <div className="flex items-center justify-between text-[#6E7085] dark:text-slate-400">
               <span className="text-[11px] font-semibold uppercase tracking-wider">Critical &amp; High</span>
-              <AlertOctagon size={16} className="text-red-400" />
+              <AlertOctagon size={16} className="text-red-500 dark:text-red-400" />
             </div>
-            <div className="mt-2 text-2xl font-bold font-mono text-red-400">{criticalCasesCount}</div>
-            <div className="mt-1 text-[11px] text-slate-400">Requires urgent analyst SLA</div>
+            <div className="mt-2 text-2xl font-bold font-mono text-red-600 dark:text-red-400">{criticalCasesCount}</div>
+            <div className="mt-1 text-[11px] text-[#6E7085] dark:text-slate-400">Requires urgent analyst SLA</div>
           </div>
 
           {/* AI Reports */}
           <div
             onClick={() => setActiveTab("reports")}
-            className="rounded-2xl border border-slate-800/80 bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-purple-500/40 transition-colors"
+            className="rounded-2xl border border-[#E2D9CC] dark:border-slate-800/80 bg-white/95 dark:bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-purple-500/40 transition-all shadow-[0_2px_12px_rgba(40,41,55,0.06)]"
           >
-            <div className="flex items-center justify-between text-slate-400">
+            <div className="flex items-center justify-between text-[#6E7085] dark:text-slate-400">
               <span className="text-[11px] font-semibold uppercase tracking-wider">Executive Reports</span>
-              <FileText size={16} className="text-purple-400" />
+              <FileText size={16} className="text-purple-500 dark:text-purple-400" />
             </div>
-            <div className="mt-2 text-2xl font-bold font-mono text-purple-300">{totalReportsCount}</div>
-            <div className="mt-1 text-[11px] text-slate-400 flex items-center gap-1">
-              <Sparkles size={11} className="text-purple-400" />
+            <div className="mt-2 text-2xl font-bold font-mono text-purple-700 dark:text-purple-300">{totalReportsCount}</div>
+            <div className="mt-1 text-[11px] text-[#6E7085] dark:text-slate-400 flex items-center gap-1">
+              <Sparkles size={11} className="text-purple-500 dark:text-purple-400" />
               <span>LLM-assisted summaries</span>
             </div>
           </div>
@@ -424,17 +424,17 @@ export function CaseManagement() {
           {/* Correlated Incidents — Interactive Card */}
           <div
             onClick={() => setActiveTab("incidents")}
-            className="group rounded-2xl border border-cyan-500/30 bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-cyan-400 hover:bg-cyan-950/20 transition-all shadow-[0_0_15px_rgba(6,182,212,0.1)]"
+            className="group rounded-2xl border border-cyan-500/30 dark:border-cyan-500/30 bg-white/95 dark:bg-[#070c18]/80 p-4 backdrop-blur-md cursor-pointer hover:border-cyan-400 hover:bg-cyan-50/50 dark:hover:bg-cyan-950/20 transition-all shadow-[0_2px_12px_rgba(40,41,55,0.06)]"
             title="Click to view all correlated incidents, source origins, and root causes"
           >
-            <div className="flex items-center justify-between text-slate-400">
-              <span className="text-[11px] font-semibold uppercase tracking-wider group-hover:text-cyan-300 transition-colors">
+            <div className="flex items-center justify-between text-[#6E7085] dark:text-slate-400">
+              <span className="text-[11px] font-semibold uppercase tracking-wider group-hover:text-cyan-700 dark:group-hover:text-cyan-300 transition-colors">
                 Correlated Incidents
               </span>
-              <ShieldAlert size={16} className="text-cyan-400 group-hover:scale-110 transition-transform" />
+              <ShieldAlert size={16} className="text-cyan-600 dark:text-cyan-400 group-hover:scale-110 transition-transform" />
             </div>
-            <div className="mt-2 text-2xl font-bold font-mono text-cyan-300">{incidents.length}</div>
-            <div className="mt-1 text-[11px] text-cyan-400/80 flex items-center gap-1 font-medium">
+            <div className="mt-2 text-2xl font-bold font-mono text-cyan-700 dark:text-cyan-300">{incidents.length}</div>
+            <div className="mt-1 text-[11px] text-cyan-700/80 dark:text-cyan-400/80 flex items-center gap-1 font-medium">
               <span>Inspect sources &amp; causes</span>
               <ArrowRight size={11} className="transition-transform group-hover:translate-x-0.5" />
             </div>
@@ -463,7 +463,7 @@ export function CaseManagement() {
         )}
 
         {/* View Switcher Tabs & Search Toolbar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border border-slate-800/80 bg-[#090e1a]/80 p-3 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 rounded-2xl border border-[#E2D9CC] dark:border-slate-800/80 bg-white/95 dark:bg-[#090e1a]/80 p-3 backdrop-blur-md shadow-[0_2px_12px_rgba(40,41,55,0.06)]">
           {/* Tab buttons */}
           <div className="flex flex-wrap items-center gap-1.5">
             <button
@@ -471,8 +471,8 @@ export function CaseManagement() {
               onClick={() => setActiveTab("cases")}
               className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "cases"
-                  ? "bg-blue-600 text-white shadow-[0_0_12px_rgba(37,99,235,0.4)]"
-                  : "bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-blue-600 text-white shadow-[0_2px_10px_rgba(37,99,235,0.3)]"
+                  : "bg-white/90 dark:bg-slate-900/60 text-[#4A4B5E] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#E2D9CC] dark:border-slate-800 shadow-xs"
               }`}
             >
               <Briefcase size={14} />
@@ -484,8 +484,8 @@ export function CaseManagement() {
               onClick={() => setActiveTab("incidents")}
               className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "incidents"
-                  ? "bg-cyan-600 text-white shadow-[0_0_12px_rgba(6,182,212,0.4)]"
-                  : "bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-cyan-600 text-white shadow-[0_2px_10px_rgba(6,182,212,0.3)]"
+                  : "bg-white/90 dark:bg-slate-900/60 text-[#4A4B5E] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#E2D9CC] dark:border-slate-800 shadow-xs"
               }`}
             >
               <ShieldAlert size={14} />
@@ -497,8 +497,8 @@ export function CaseManagement() {
               onClick={() => setActiveTab("reports")}
               className={`flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "reports"
-                  ? "bg-purple-600 text-white shadow-[0_0_12px_rgba(168,85,247,0.4)]"
-                  : "bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-purple-600 text-white shadow-[0_2px_10px_rgba(168,85,247,0.3)]"
+                  : "bg-white/90 dark:bg-slate-900/60 text-[#4A4B5E] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#E2D9CC] dark:border-slate-800 shadow-xs"
               }`}
             >
               <FileText size={14} />
@@ -510,8 +510,8 @@ export function CaseManagement() {
               onClick={() => setActiveTab("unified")}
               className={`hidden xl:flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold transition-all cursor-pointer ${
                 activeTab === "unified"
-                  ? "bg-indigo-600 text-white shadow-[0_0_12px_rgba(99,102,241,0.4)]"
-                  : "bg-slate-900/60 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-indigo-600 text-white shadow-[0_2px_10px_rgba(99,102,241,0.3)]"
+                  : "bg-white/90 dark:bg-slate-900/60 text-[#4A4B5E] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#E2D9CC] dark:border-slate-800 shadow-xs"
               }`}
             >
               <Layers size={14} />
@@ -521,13 +521,13 @@ export function CaseManagement() {
 
           {/* Search bar */}
           <div className="relative flex-1 sm:max-w-xs">
-            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#6E7085] dark:text-slate-400" />
             <input
               type="text"
               placeholder="Search by title, IP, ID or root cause..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-slate-800 bg-slate-950/80 py-1.5 pl-9 pr-3 text-xs text-slate-200 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-[#E2D9CC] dark:border-slate-800 bg-white/90 dark:bg-slate-950/80 py-1.5 pl-9 pr-3 text-xs text-[#282937] dark:text-slate-200 placeholder-[#888485] dark:placeholder-slate-500 focus:border-blue-500 focus:outline-none shadow-xs"
             />
             {searchQuery && (
               <button
@@ -549,7 +549,7 @@ export function CaseManagement() {
             {/* Filter pills */}
             <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
               <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-slate-500 font-medium mr-1 flex items-center gap-1">
+                <span className="text-[#6E7085] dark:text-slate-500 font-medium mr-1 flex items-center gap-1">
                   <Filter size={12} /> Status:
                 </span>
                 {["all", ...STATUSES].map((s) => (
@@ -559,8 +559,8 @@ export function CaseManagement() {
                     onClick={() => setStatusFilter(s)}
                     className={`rounded-lg px-2.5 py-1 text-[11px] font-medium capitalize transition-colors cursor-pointer ${
                       statusFilter === s
-                        ? "bg-blue-500/20 text-blue-300 border border-blue-500/40"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900"
+                        ? "bg-blue-500/20 text-blue-700 dark:text-blue-300 border border-blue-500/40"
+                        : "text-[#4A4B5E] dark:text-slate-400 hover:text-[#282937] dark:hover:text-slate-200 hover:bg-[#F8F4EC] dark:hover:bg-slate-900"
                     }`}
                   >
                     {s}
@@ -827,14 +827,14 @@ export function CaseManagement() {
                 <select
                   value={reportTargetIncidentId}
                   onChange={(e) => setReportTargetIncidentId(e.target.value)}
-                  className="rounded-xl border border-slate-700 bg-slate-900/90 px-3.5 py-2 text-xs text-slate-200 focus:border-purple-400 focus:outline-none min-w-[200px]"
+                  className="rounded-xl border border-slate-700 bg-[#0b111e] px-3.5 py-2 text-xs text-slate-100 focus:border-purple-400 focus:outline-none min-w-[200px] cursor-pointer"
                 >
                   {incidents.map((inc) => (
-                    <option key={inc.id} value={inc.id}>
+                    <option key={inc.id} value={inc.id} className="bg-[#0b111e] text-slate-200">
                       [{inc.severity.toUpperCase()}] {inc.title}
                     </option>
                   ))}
-                  {incidents.length === 0 && <option value="">No active incidents found</option>}
+                  {incidents.length === 0 && <option value="" className="bg-[#0b111e] text-slate-400">No active incidents found</option>}
                 </select>
 
                 <button
@@ -990,10 +990,10 @@ export function CaseManagement() {
                         <select
                           value={c.status}
                           onChange={(e) => handleUpdateStatus(c.id, e.target.value)}
-                          className={`rounded-lg border px-2 py-0.5 text-[10px] font-semibold ${statInfo.bg} ${statInfo.text} ${statInfo.border} bg-slate-900`}
+                          className={`rounded-lg border px-2 py-0.5 text-[10px] font-semibold ${statInfo.bg} ${statInfo.text} ${statInfo.border} bg-[#0b111e] cursor-pointer`}
                         >
                           {STATUSES.map((s) => (
-                            <option key={s} value={s}>{STATUS_BADGE[s]?.label || s}</option>
+                            <option key={s} value={s} className="bg-[#0b111e] text-slate-200">{STATUS_BADGE[s]?.label || s}</option>
                           ))}
                         </select>
                       </div>
@@ -1335,12 +1335,12 @@ export function CaseManagement() {
                       <select
                         value={newSeverity}
                         onChange={(e) => setNewSeverity(e.target.value)}
-                        className="w-full rounded-xl border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 focus:border-blue-500 focus:outline-none capitalize"
+                        className="w-full rounded-xl border border-slate-700/80 bg-[#0b111e] px-3 py-2 text-xs text-slate-100 focus:border-blue-500 focus:outline-none capitalize cursor-pointer"
                       >
-                        <option value="low">Low</option>
-                        <option value="medium">Medium</option>
-                        <option value="high">High</option>
-                        <option value="critical">Critical</option>
+                        <option value="low" className="bg-[#0b111e] text-slate-200">Low</option>
+                        <option value="medium" className="bg-[#0b111e] text-slate-200">Medium</option>
+                        <option value="high" className="bg-[#0b111e] text-slate-200">High</option>
+                        <option value="critical" className="bg-[#0b111e] text-slate-200">Critical</option>
                       </select>
                     </div>
 
@@ -1349,11 +1349,11 @@ export function CaseManagement() {
                       <select
                         value={newIncidentId}
                         onChange={(e) => setNewIncidentId(e.target.value)}
-                        className="w-full rounded-xl border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 focus:border-blue-500 focus:outline-none"
+                        className="w-full rounded-xl border border-slate-700/80 bg-[#0b111e] px-3 py-2 text-xs text-slate-100 focus:border-blue-500 focus:outline-none cursor-pointer"
                       >
-                        <option value="">-- None --</option>
+                        <option value="" className="bg-[#0b111e] text-slate-400">-- None --</option>
                         {incidents.map((inc) => (
-                          <option key={inc.id} value={inc.id}>
+                          <option key={inc.id} value={inc.id} className="bg-[#0b111e] text-slate-200">
                             [{inc.severity.toUpperCase()}] {inc.title.slice(0, 26)}
                           </option>
                         ))}
@@ -1441,14 +1441,14 @@ export function CaseManagement() {
                         setReportTargetIncidentId(e.target.value);
                         setCustomIncidentInput("");
                       }}
-                      className="w-full rounded-xl border border-slate-700 bg-black/40 px-3.5 py-2 text-xs text-slate-100 focus:border-purple-400 focus:outline-none"
+                      className="w-full rounded-xl border border-slate-700/80 bg-[#0b111e] px-3.5 py-2 text-xs text-slate-100 focus:border-purple-400 focus:outline-none cursor-pointer"
                     >
                       {incidents.map((inc) => (
-                        <option key={inc.id} value={inc.id}>
+                        <option key={inc.id} value={inc.id} className="bg-[#0b111e] text-slate-200">
                           [{inc.severity.toUpperCase()}] {inc.title} ({inc.id.slice(0, 8)}...)
                         </option>
                       ))}
-                      {incidents.length === 0 && <option value="">No incidents available</option>}
+                      {incidents.length === 0 && <option value="" className="bg-[#0b111e] text-slate-400">No incidents available</option>}
                     </select>
                   </div>
 

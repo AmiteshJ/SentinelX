@@ -93,18 +93,18 @@ export function MitreMatrix() {
     <DashboardShell>
       <div className="space-y-6 pb-12">
         {/* Header Banner */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-gradient-to-r from-[#0d1527] via-[#09101f] to-[#060a14] border border-slate-800/80 shadow-2xl relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 rounded-3xl bg-white/95 dark:bg-gradient-to-r dark:from-[#0d1527] dark:via-[#09101f] dark:to-[#060a14] border border-[#e2d9cc] dark:border-slate-800/80 shadow-[0_4px_24px_rgba(40,41,55,0.06)] dark:shadow-2xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-96 h-96 bg-sx-blue/10 rounded-full blur-[100px] pointer-events-none" />
           
           <div className="relative z-10 space-y-1.5">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sx-blue/10 border border-sx-blue/30 text-sx-blue text-xs font-semibold">
-              <Compass size={14} className="text-sx-blue animate-spin-slow" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 dark:bg-sx-blue/10 border border-blue-200 dark:border-sx-blue/30 text-blue-700 dark:text-sx-blue text-xs font-semibold">
+              <Compass size={14} className="text-blue-600 dark:text-sx-blue animate-spin-slow" />
               MITRE ATT&amp;CK Matrix Navigator
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#282937] dark:text-white">
               Enterprise Tactics &amp; Detection Coverage Heatmap
             </h1>
-            <p className="text-xs sm:text-sm text-slate-400 max-w-2xl">
+            <p className="text-xs sm:text-sm text-[#4a4b5e] dark:text-slate-400 max-w-2xl">
               Inspect active Sigma rule coverage, detect defensive visibility gaps, and trace live triggered alerts mapped to MITRE ATT&amp;CK tactics.
             </p>
           </div>
@@ -112,41 +112,41 @@ export function MitreMatrix() {
           {/* Quick Metrics */}
           {data?.summary && (
             <div className="relative z-10 flex flex-wrap items-center gap-3">
-              <div className="px-4 py-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-center min-w-[110px]">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Rule Coverage</span>
-                <p className="text-xl font-bold text-emerald-400">{data.summary.coverage_percentage}%</p>
-                <span className="text-[10px] text-slate-500">{data.summary.covered_techniques} / {data.summary.total_techniques} Techs</span>
+              <div className="px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900/80 border border-[#e2d9cc] dark:border-slate-800 text-center min-w-[110px] shadow-xs">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#58565e] dark:text-slate-400">Rule Coverage</span>
+                <p className="text-xl font-bold text-emerald-600 dark:text-emerald-400">{data.summary.coverage_percentage}%</p>
+                <span className="text-[10px] text-[#58565e] dark:text-slate-500">{data.summary.covered_techniques} / {data.summary.total_techniques} Techs</span>
               </div>
 
-              <div className="px-4 py-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-center min-w-[110px]">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Active Detections</span>
-                <p className="text-xl font-bold text-rose-400 flex items-center justify-center gap-1">
-                  <Flame size={18} className="text-rose-400 animate-pulse" />
+              <div className="px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900/80 border border-[#e2d9cc] dark:border-slate-800 text-center min-w-[110px] shadow-xs">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#58565e] dark:text-slate-400">Active Detections</span>
+                <p className="text-xl font-bold text-rose-600 dark:text-rose-400 flex items-center justify-center gap-1">
+                  <Flame size={18} className="text-rose-600 dark:text-rose-400 animate-pulse" />
                   {data.summary.active_alerts_techniques}
                 </p>
-                <span className="text-[10px] text-slate-500">Live Exploited</span>
+                <span className="text-[10px] text-[#58565e] dark:text-slate-500">Live Exploited</span>
               </div>
 
-              <div className="px-4 py-2.5 rounded-2xl bg-slate-900/80 border border-slate-800 text-center min-w-[110px]">
-                <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400">Coverage Gaps</span>
-                <p className="text-xl font-bold text-amber-400">{data.summary.uncovered_gaps}</p>
-                <span className="text-[10px] text-slate-500">Uncovered Techs</span>
+              <div className="px-4 py-2.5 rounded-2xl bg-white dark:bg-slate-900/80 border border-[#e2d9cc] dark:border-slate-800 text-center min-w-[110px] shadow-xs">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-[#58565e] dark:text-slate-400">Coverage Gaps</span>
+                <p className="text-xl font-bold text-amber-600 dark:text-amber-400">{data.summary.uncovered_gaps}</p>
+                <span className="text-[10px] text-[#58565e] dark:text-slate-500">Uncovered Techs</span>
               </div>
             </div>
           )}
         </div>
 
         {/* Toolbar & Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-[#090e1a]/80 border border-slate-800/80 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-4 rounded-2xl bg-white/95 dark:bg-[#090e1a]/80 border border-[#e2d9cc] dark:border-slate-800/80 backdrop-blur-md shadow-xs">
           {/* Search box */}
           <div className="relative flex-1 max-w-md">
-            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#58565e] dark:text-slate-400" />
             <input
               type="text"
               placeholder="Search by ID (e.g. T1059) or technique name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-900/90 border border-slate-700/70 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-sx-blue/30 focus:border-sx-blue"
+              className="w-full pl-10 pr-4 py-2 rounded-xl bg-white dark:bg-slate-900/90 border border-[#e2d9cc] dark:border-slate-700/70 text-sm text-[#282937] dark:text-slate-100 placeholder:text-[#6e7085] dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 shadow-xs"
             />
           </div>
 
@@ -154,20 +154,20 @@ export function MitreMatrix() {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
             <button
               onClick={() => setStatusFilter("all")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all shrink-0 cursor-pointer ${
                 statusFilter === "all"
-                  ? "bg-sx-blue text-[#060a14] shadow-[0_0_15px_rgba(58,160,255,0.3)]"
-                  : "bg-slate-900 text-slate-400 hover:text-white border border-slate-800"
+                  ? "bg-blue-600 dark:bg-sx-blue text-white dark:text-[#060a14] shadow-xs"
+                  : "bg-white dark:bg-slate-900 text-[#4a4b5e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800 shadow-xs"
               }`}
             >
               All Techniques
             </button>
             <button
               onClick={() => setStatusFilter("active_alerts")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
                 statusFilter === "active_alerts"
-                  ? "bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.4)]"
-                  : "bg-slate-900 text-rose-400 hover:text-white border border-slate-800"
+                  ? "bg-rose-600 dark:bg-rose-500 text-white shadow-xs"
+                  : "bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800 shadow-xs"
               }`}
             >
               <Flame size={13} />
@@ -175,10 +175,10 @@ export function MitreMatrix() {
             </button>
             <button
               onClick={() => setStatusFilter("covered")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
                 statusFilter === "covered"
-                  ? "bg-emerald-500 text-[#060a14] shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                  : "bg-slate-900 text-emerald-400 hover:text-white border border-slate-800"
+                  ? "bg-emerald-600 dark:bg-emerald-500 text-white dark:text-[#060a14] shadow-xs"
+                  : "bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800 shadow-xs"
               }`}
             >
               <ShieldCheck size={13} />
@@ -186,10 +186,10 @@ export function MitreMatrix() {
             </button>
             <button
               onClick={() => setStatusFilter("uncovered_gap")}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-all shrink-0 cursor-pointer ${
                 statusFilter === "uncovered_gap"
-                  ? "bg-amber-500 text-[#060a14] shadow-[0_0_15px_rgba(245,158,11,0.3)]"
-                  : "bg-slate-900 text-amber-400 hover:text-white border border-slate-800"
+                  ? "bg-amber-600 dark:bg-amber-500 text-white dark:text-[#060a14] shadow-xs"
+                  : "bg-white dark:bg-slate-900 text-amber-600 dark:text-amber-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800 shadow-xs"
               }`}
             >
               <AlertTriangle size={13} />

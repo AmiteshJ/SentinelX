@@ -41,6 +41,7 @@ export function GraphCorrelationModal({
   const [chokePoints, setChokePoints] = useState<ChokePoint[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
 
   // Close on Escape key
   useEffect(() => {
@@ -116,7 +117,7 @@ export function GraphCorrelationModal({
         const res = await fetchGlobalCorrelationGraph(25);
         setNodes(res.nodes);
         setEdges(res.edges);
-        setChokePoints([]);
+        setChokePoints(res.summary?.choke_points || []);
       } else {
         const targetId = selectedIncidentId || incidentsList[0]?.id;
         if (targetId) {
@@ -167,31 +168,31 @@ export function GraphCorrelationModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 16 }}
             transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="relative z-10 flex h-full max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[28px] border border-cyan-500/30 bg-[#060b16]/98 shadow-[0_40px_120px_-20px_rgba(0,0,0,0.95)]"
+            className="relative z-10 flex h-full max-h-[92vh] w-full max-w-6xl flex-col overflow-hidden rounded-[28px] border border-[#e2d9cc] dark:border-cyan-500/30 bg-white/98 dark:bg-[#060b16]/98 shadow-[0_20px_60px_rgba(40,41,55,0.18)] dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.95)]"
           >
             {/* Ambient Background Glows */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-              <div className="absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-cyan-500/15 blur-[130px]" />
+              <div className="absolute -top-32 -left-32 h-[420px] w-[420px] rounded-full bg-cyan-500/10 dark:bg-cyan-500/15 blur-[130px]" />
               <div className="absolute -bottom-32 -right-32 h-[420px] w-[420px] rounded-full bg-indigo-500/10 blur-[130px]" />
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#e2d9cc] dark:via-cyan-400/30 to-transparent" />
             </div>
 
             {/* Modal Header */}
-            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] px-6 py-4.5">
+            <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#e2d9cc] dark:border-white/[0.08] px-6 py-4.5">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-50 dark:bg-cyan-500/15 border border-cyan-300 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-400 shadow-xs">
                   <Network size={20} />
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-base sm:text-lg font-bold text-white tracking-tight">
+                    <h2 className="text-base sm:text-lg font-bold text-[#282937] dark:text-white tracking-tight">
                       Graph Correlation Insights
                     </h2>
-                    <span className="rounded-full bg-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-300 border border-cyan-500/30">
+                    <span className="rounded-full bg-cyan-50 dark:bg-cyan-500/20 px-2 py-0.5 text-[10px] font-mono text-cyan-800 dark:text-cyan-300 border border-cyan-300 dark:border-cyan-500/30 font-semibold">
                       Phase 11 Engine
                     </span>
                   </div>
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-[#58565e] dark:text-slate-400">
                     Multi-hop threat entity relations, attack paths &amp; pivot choke points
                   </p>
                 </div>
@@ -204,16 +205,16 @@ export function GraphCorrelationModal({
                   onClick={loadGraphData}
                   disabled={loading}
                   title="Refresh Graph"
-                  className="flex items-center gap-1.5 rounded-xl border border-slate-700/80 bg-slate-900/90 px-3 py-1.5 text-xs font-semibold text-slate-300 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="flex items-center gap-1.5 rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-slate-900/90 px-3 py-1.5 text-xs font-semibold text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-slate-800 transition-colors cursor-pointer shadow-xs"
                 >
-                  <RefreshCw size={13} className={loading ? "animate-spin text-cyan-400" : ""} />
+                  <RefreshCw size={13} className={loading ? "animate-spin text-cyan-500 dark:text-cyan-400" : ""} />
                   <span>Refresh</span>
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   aria-label="Close modal"
-                  className="flex h-9 w-9 items-center justify-center rounded-xl text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer"
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-[#58565e] hover:bg-[#f8f4ec] hover:text-[#282937] dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -221,15 +222,15 @@ export function GraphCorrelationModal({
             </div>
 
             {/* View Switcher & Incident Filter Bar */}
-            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-white/[0.06] bg-[#090e1a]/60 px-6 py-3">
+            <div className="relative flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 border-b border-[#e2d9cc] dark:border-white/[0.06] bg-[#fcfaf5] dark:bg-[#090e1a]/60 px-6 py-3">
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => setMode("global")}
                   className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                     mode === "global"
-                      ? "bg-cyan-500 text-[#04101a] shadow-[0_0_15px_rgba(6,182,212,0.4)]"
-                      : "bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800"
+                      ? "bg-cyan-600 dark:bg-cyan-500 text-white dark:text-[#04101a] shadow-xs"
+                      : "bg-white dark:bg-slate-900/80 text-[#4a4b5e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800"
                   }`}
                 >
                   <Layers size={13} />
@@ -240,8 +241,8 @@ export function GraphCorrelationModal({
                   onClick={() => setMode("incident")}
                   className={`flex items-center gap-2 rounded-xl px-3.5 py-1.5 text-xs font-semibold transition-all cursor-pointer ${
                     mode === "incident"
-                      ? "bg-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.4)]"
-                      : "bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800"
+                      ? "bg-purple-600 dark:bg-purple-500 text-white shadow-xs"
+                      : "bg-white dark:bg-slate-900/80 text-[#4a4b5e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white border border-[#e2d9cc] dark:border-slate-800"
                   }`}
                 >
                   <Crosshair size={13} />
@@ -251,19 +252,19 @@ export function GraphCorrelationModal({
 
               {mode === "incident" && (
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-slate-400 font-medium whitespace-nowrap">Target Incident:</span>
+                  <span className="text-xs text-[#58565e] dark:text-slate-400 font-medium whitespace-nowrap">Target Incident:</span>
                   <select
                     value={selectedIncidentId}
                     onChange={(e) => setSelectedIncidentId(e.target.value)}
-                    className="max-w-xs truncate rounded-xl border border-slate-700 bg-slate-900/90 px-3 py-1.5 text-xs text-slate-200 focus:border-purple-400 focus:outline-none"
+                    className="max-w-xs truncate rounded-xl border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-[#0b111e] px-3.5 py-1.5 text-xs text-[#282937] dark:text-slate-100 focus:border-purple-400 focus:outline-none cursor-pointer shadow-xs"
                   >
                     {incidentsList.map((inc) => (
-                      <option key={inc.id} value={inc.id}>
+                      <option key={inc.id} value={inc.id} className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">
                         [{inc.severity.toUpperCase()}] {inc.title}
                       </option>
                     ))}
                     {incidentsList.length === 0 && (
-                      <option value="">No active incidents found</option>
+                      <option value="" className="bg-white dark:bg-[#0b111e] text-[#58565e] dark:text-slate-400">No active incidents found</option>
                     )}
                   </select>
                 </div>
@@ -272,34 +273,41 @@ export function GraphCorrelationModal({
 
             {/* Modal Body / Graph Workspace */}
             <div className="relative flex-1 overflow-y-auto p-4 sm:p-6 space-y-4">
-              {/* Choke Points / Pivot Highlights (if incident mode has choke points) */}
+              {/* Choke Points / Pivot Highlights (if incident mode or global mode has choke points) */}
               {chokePoints.length > 0 && (
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/25 via-slate-900/50 to-slate-900/25 p-3.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[#e2d9cc] dark:border-cyan-500/30 bg-[#fefbf4] dark:bg-gradient-to-r dark:from-cyan-950/25 dark:via-slate-900/50 dark:to-slate-900/25 p-3.5 shadow-xs">
                   <div className="flex items-center gap-2.5">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-cyan-50 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 border border-cyan-300 dark:border-cyan-500/30">
                       <Zap size={16} />
                     </div>
                     <div>
-                      <h3 className="text-xs font-bold text-white uppercase tracking-wider">
+                      <h3 className="text-xs font-bold text-[#282937] dark:text-white uppercase tracking-wider">
                         Identified Attack Choke Points
                       </h3>
-                      <p className="text-[11px] text-slate-400">
-                        Critical high-degree entities connecting multi-hop attack vectors
+                      <p className="text-[11px] text-[#58565e] dark:text-slate-400">
+                        Click any pivot to center and inspect connected attack paths
                       </p>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-2">
                     {chokePoints.map((cp) => (
-                      <div
+                      <button
                         key={cp.id}
-                        className="flex items-center gap-2 rounded-xl border border-cyan-500/40 bg-slate-900/90 px-3 py-1 text-xs"
+                        type="button"
+                        onClick={() => setFocusedNodeId(cp.id)}
+                        className={`flex items-center gap-2 rounded-xl border px-3 py-1 text-xs cursor-pointer transition-all ${
+                          focusedNodeId === cp.id
+                            ? "bg-cyan-50 dark:bg-cyan-500/20 border-cyan-500 text-cyan-900 dark:text-white shadow-xs"
+                            : "bg-white dark:bg-slate-900/90 border-[#e2d9cc] dark:border-cyan-500/40 text-[#282937] dark:text-slate-300 hover:border-cyan-400"
+                        }`}
+                        title="Click to focus node in graph"
                       >
-                        <span className="font-mono font-bold text-cyan-300">{cp.label}</span>
-                        <span className="rounded bg-cyan-500/20 px-1.5 py-0.5 text-[10px] font-bold text-cyan-400">
+                        <span className="font-mono font-bold text-cyan-800 dark:text-cyan-300">{cp.label}</span>
+                        <span className="rounded bg-cyan-100 dark:bg-cyan-500/20 px-1.5 py-0.5 text-[10px] font-bold text-cyan-800 dark:text-cyan-400">
                           {cp.degree} Links
                         </span>
-                      </div>
+                      </button>
                     ))}
                   </div>
                 </div>
@@ -307,44 +315,50 @@ export function GraphCorrelationModal({
 
               {/* Main Graph Visualization */}
               {loading ? (
-                <div className="flex h-[460px] flex-col items-center justify-center gap-3 rounded-2xl border border-slate-800 bg-[#070b14]">
-                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-400 border-t-transparent" />
-                  <p className="text-xs text-slate-400 font-mono">Building multi-hop entity graph...</p>
+                <div className="flex h-[460px] flex-col items-center justify-center gap-3 rounded-2xl border border-[#e2d9cc] dark:border-slate-800 bg-[#fefbf4] dark:bg-[#070b14]">
+                  <div className="h-10 w-10 animate-spin rounded-full border-2 border-cyan-500 dark:border-cyan-400 border-t-transparent" />
+                  <p className="text-xs text-[#58565e] dark:text-slate-400 font-mono">Building multi-hop entity graph...</p>
                 </div>
               ) : error ? (
-                <div className="flex h-[460px] flex-col items-center justify-center rounded-2xl border border-rose-500/30 bg-rose-500/10 p-8 text-center text-rose-300">
-                  <ShieldAlert size={32} className="mb-2 text-rose-400" />
+                <div className="flex h-[460px] flex-col items-center justify-center rounded-2xl border border-rose-500/30 bg-rose-50 dark:bg-rose-500/10 p-8 text-center text-rose-800 dark:text-rose-300">
+                  <ShieldAlert size={32} className="mb-2 text-rose-500 dark:text-rose-400" />
                   <p className="text-sm font-semibold">{error}</p>
                 </div>
               ) : nodes.length === 0 ? (
-                <div className="flex h-[460px] flex-col items-center justify-center rounded-2xl border border-slate-800 bg-slate-950/60 p-12 text-center text-slate-400">
-                  <Info size={32} className="mb-2 text-slate-500" />
-                  <p className="text-sm font-medium text-slate-300">No correlated entities in this view yet</p>
-                  <p className="text-xs text-slate-500 mt-1">
+                <div className="flex h-[460px] flex-col items-center justify-center rounded-2xl border border-[#e2d9cc] dark:border-slate-800 bg-[#fefbf4] dark:bg-slate-950/60 p-12 text-center text-[#58565e] dark:text-slate-400">
+                  <Info size={32} className="mb-2 text-[#58565e] dark:text-slate-500" />
+                  <p className="text-sm font-medium text-[#282937] dark:text-slate-300">No correlated entities in this view yet</p>
+                  <p className="text-xs text-[#58565e] dark:text-slate-500 mt-1">
                     Ingest telemetry or run detection rules to automatically establish multi-hop correlation links.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="overflow-hidden rounded-2xl border border-slate-800/80 bg-[#070b14]">
-                    <AttackGraph nodes={nodes} edges={edges} height={480} />
+                  <div className="overflow-hidden rounded-2xl border border-[#e2d9cc] dark:border-slate-800/80 bg-[#fff5e6] dark:bg-[#070b14] shadow-xs">
+                    <AttackGraph
+                      nodes={nodes}
+                      edges={edges}
+                      height={500}
+                      selectedNodeId={focusedNodeId}
+                      onNodeClick={(node) => setFocusedNodeId(node.id)}
+                    />
                   </div>
                 </div>
               )}
             </div>
 
             {/* Modal Footer / Stats & Guide */}
-            <div className="relative flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.08] bg-[#070c18] px-6 py-3 text-xs font-mono text-slate-400">
+            <div className="relative flex flex-wrap items-center justify-between gap-3 border-t border-[#e2d9cc] dark:border-white/[0.08] bg-[#fcfaf5] dark:bg-[#070c18] px-6 py-3 text-xs font-mono text-[#58565e] dark:text-slate-400">
               <div className="flex items-center gap-4">
                 <span>
-                  Correlated Entities: <strong className="text-white font-semibold">{nodes.length}</strong>
+                  Correlated Entities: <strong className="text-[#282937] dark:text-white font-semibold">{nodes.length}</strong>
                 </span>
                 <span>
-                  Active Relations: <strong className="text-white font-semibold">{edges.length}</strong>
+                  Active Relations: <strong className="text-[#282937] dark:text-white font-semibold">{edges.length}</strong>
                 </span>
               </div>
-              <span className="text-[11px] text-slate-500 hidden sm:inline">
-                Interactive: Click any node to inspect attributes &amp; MITRE tags. Drag to manipulate topology.
+              <span className="text-[11px] text-[#58565e] dark:text-slate-400 hidden sm:inline">
+                Directional animated pulses show live multi-hop attack propagation. Click any node or edge to inspect.
               </span>
             </div>
           </motion.div>

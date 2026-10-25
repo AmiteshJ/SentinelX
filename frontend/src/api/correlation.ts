@@ -49,6 +49,7 @@ export interface GlobalGraphResponse {
     total_incidents: number;
     total_nodes: number;
     total_edges: number;
+    choke_points?: ChokePoint[];
   };
 }
 

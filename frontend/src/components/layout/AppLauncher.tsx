@@ -19,6 +19,7 @@ import {
 import { useEffect, useMemo, useRef, useState, type ComponentType } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "../../theme/ThemeProvider";
 
 interface TileApp {
   id: string;
@@ -205,6 +206,8 @@ const itemVariants = {
 };
 
 export function AppLauncher() {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLInputElement>(null);
@@ -257,7 +260,7 @@ export function AppLauncher() {
         aria-label="Open application launcher"
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
-        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue cursor-pointer"
+        className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 transition-colors hover:bg-black/5 dark:hover:bg-white/10 hover:text-slate-900 dark:hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue cursor-pointer"
         title="Application Launcher"
       >
         <LayoutGrid size={20} />
@@ -275,12 +278,18 @@ export function AppLauncher() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 z-[9999] h-screen w-screen overflow-y-auto bg-[#040814]/90 backdrop-blur-2xl text-white flex flex-col items-center justify-start sm:justify-center p-4 sm:p-8 md:p-12 select-none"
+              className={`fixed inset-0 z-[9999] h-screen w-screen overflow-y-auto backdrop-blur-2xl flex flex-col items-center justify-start sm:justify-center p-4 sm:p-8 md:p-12 select-none ${
+                isDark ? "bg-[#040814]/90 text-white" : "bg-[#FFF5E6]/95 text-[#282937]"
+              }`}
             >
               {/* Subtle ambient lighting */}
               <div className="pointer-events-none fixed inset-0 overflow-hidden">
-                <div className="absolute top-1/4 left-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-sky-500/[0.06] blur-[150px]" />
-                <div className="absolute bottom-1/4 right-1/3 h-[500px] w-[500px] rounded-full bg-indigo-500/[0.05] blur-[160px]" />
+                <div className={`absolute top-1/4 left-1/3 h-[500px] w-[500px] -translate-x-1/2 rounded-full blur-[150px] ${
+                  isDark ? "bg-sky-500/[0.06]" : "bg-[#FA8775]/[0.18]"
+                }`} />
+                <div className={`absolute bottom-1/4 right-1/3 h-[500px] w-[500px] rounded-full blur-[160px] ${
+                  isDark ? "bg-indigo-500/[0.05]" : "bg-[#9D85F2]/[0.16]"
+                }`} />
               </div>
 
               {/* Floating Close Button (Top-Right) */}
@@ -291,7 +300,11 @@ export function AppLauncher() {
                   e.stopPropagation();
                   setOpen(false);
                 }}
-                className="fixed top-6 right-6 sm:top-8 sm:right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-slate-400 hover:border-white/20 hover:bg-white/[0.08] hover:text-white transition-all cursor-pointer backdrop-blur-md"
+                className={`fixed top-6 right-6 sm:top-8 sm:right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full border transition-all cursor-pointer backdrop-blur-md shadow-sm ${
+                  isDark
+                    ? "border-white/10 bg-white/[0.04] text-slate-400 hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+                    : "border-[#E2D9CC] bg-white/90 text-[#282937] hover:border-[#FA8775]/60 hover:bg-white hover:text-black"
+                }`}
               >
                 <X size={18} />
               </button>
@@ -306,20 +319,28 @@ export function AppLauncher() {
                   <div className="relative w-full">
                     <SearchIcon
                       size={15}
-                      className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"
+                      className={`pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 ${
+                        isDark ? "text-slate-400" : "text-[#6E7085]"
+                      }`}
                     />
                     <input
                       ref={searchRef}
                       value={query}
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Search applications..."
-                      className="w-full rounded-2xl border border-white/10 bg-white/[0.04] py-3 pl-11 pr-10 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 backdrop-blur-xl focus:border-sky-400/50 focus:bg-white/[0.07] focus:outline-none transition-all shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+                      className={`w-full rounded-2xl border py-3 pl-11 pr-10 text-xs sm:text-sm backdrop-blur-xl focus:outline-none transition-all ${
+                        isDark
+                          ? "border-white/10 bg-white/[0.04] text-slate-100 placeholder:text-slate-500 focus:border-sky-400/50 focus:bg-white/[0.07] shadow-[0_8px_30px_rgb(0,0,0,0.12)]"
+                          : "border-[#E2D9CC] bg-white/95 text-[#282937] placeholder:text-[#888485] focus:border-[#FA8775] focus:bg-white shadow-[0_4px_24px_rgba(40,41,55,0.06)]"
+                      }`}
                     />
                     {query && (
                       <button
                         type="button"
                         onClick={() => setQuery("")}
-                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white"
+                        className={`absolute right-3.5 top-1/2 -translate-y-1/2 ${
+                          isDark ? "text-slate-400 hover:text-white" : "text-[#6E7085] hover:text-[#282937]"
+                        }`}
                       >
                         <X size={14} />
                       </button>
@@ -329,10 +350,12 @@ export function AppLauncher() {
 
                 {/* Symmetrical Window Glass Tiles Grid */}
                 {filteredApps.length === 0 ? (
-                  <div className="flex h-56 flex-col items-center justify-center text-center text-slate-400">
-                    <LayoutGrid size={36} className="mb-2 text-slate-600" />
-                    <p className="text-sm font-medium text-slate-300">No applications match "{query}"</p>
-                    <p className="text-xs text-slate-500 mt-1">Press Esc to exit or try a different term</p>
+                  <div className={`flex h-56 flex-col items-center justify-center text-center ${
+                    isDark ? "text-slate-400" : "text-[#6E7085]"
+                  }`}>
+                    <LayoutGrid size={36} className={`mb-2 ${isDark ? "text-slate-600" : "text-[#B8B2AD]"}`} />
+                    <p className={`text-sm font-semibold ${isDark ? "text-slate-300" : "text-[#282937]"}`}>No applications match "{query}"</p>
+                    <p className="text-xs mt-1 opacity-80">Press Esc to exit or try a different term</p>
                   </div>
                 ) : (
                   <motion.div
@@ -345,6 +368,7 @@ export function AppLauncher() {
                       <GlassTile
                         key={app.id}
                         app={app}
+                        isDark={isDark}
                         onSelect={handleSelect}
                       />
                     ))}
@@ -352,8 +376,12 @@ export function AppLauncher() {
                 )}
 
                 {/* Minimalist Keycap hint */}
-                <div className="mt-8 text-center text-[11px] font-mono text-slate-500">
-                  Press <kbd className="rounded border border-white/10 bg-white/5 px-1.5 py-0.5 text-slate-400">Esc</kbd> or click outside to dismiss
+                <div className={`mt-8 text-center text-[11px] font-mono ${
+                  isDark ? "text-slate-500" : "text-[#6E7085]"
+                }`}>
+                  Press <kbd className={`rounded border px-1.5 py-0.5 ${
+                    isDark ? "border-white/10 bg-white/5 text-slate-400" : "border-[#E2D9CC] bg-white text-[#282937] shadow-xs"
+                  }`}>Esc</kbd> or click outside to dismiss
                 </div>
               </div>
             </motion.div>
@@ -370,9 +398,11 @@ export function AppLauncher() {
 // ---------------------------------------------------------------------------
 function GlassTile({
   app,
+  isDark,
   onSelect,
 }: {
   app: TileApp;
+  isDark: boolean;
   onSelect: (path: string) => void;
 }) {
   const Icon = app.icon;
@@ -386,7 +416,9 @@ function GlassTile({
         scale: 1.045,
         y: -4,
         zIndex: 30,
-        boxShadow: "0 20px 40px -12px rgba(0, 0, 0, 0.7), 0 0 25px 2px rgba(56, 189, 248, 0.16)",
+        boxShadow: isDark
+          ? "0 20px 40px -12px rgba(0, 0, 0, 0.7), 0 0 25px 2px rgba(56, 189, 248, 0.16)"
+          : "0 16px 36px -8px rgba(40, 41, 55, 0.14), 0 0 20px 2px rgba(250, 135, 117, 0.22)",
       }}
       whileTap={{ scale: 0.97 }}
       transition={{
@@ -395,12 +427,18 @@ function GlassTile({
         damping: 24,
       }}
       onClick={() => onSelect(app.path)}
-      className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] p-4 text-left backdrop-blur-xl transition-[border-color,background-color] duration-200 hover:border-sky-400/40 hover:bg-white/[0.06] cursor-pointer ${
+      className={`group relative flex flex-col justify-between overflow-hidden rounded-2xl border p-4 text-left backdrop-blur-xl transition-[border-color,background-color] duration-200 cursor-pointer ${
         isWide ? "col-span-2 h-[115px]" : "col-span-1 h-[115px]"
+      } ${
+        isDark
+          ? "border-white/[0.08] bg-white/[0.03] hover:border-sky-400/40 hover:bg-white/[0.06]"
+          : "border-[#E2D9CC] bg-white/95 hover:border-[#FA8775]/60 hover:bg-white shadow-[0_2px_12px_rgba(40,41,55,0.06)]"
       }`}
     >
       {/* Specular glass reflection sheen */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/[0.04] to-transparent" />
+      <div className={`pointer-events-none absolute inset-x-0 top-0 h-1/2 ${
+        isDark ? "bg-gradient-to-b from-white/[0.04] to-transparent" : "bg-gradient-to-b from-white to-transparent"
+      }`} />
 
       {/* Top row: Icon and optional pill badge */}
       <div className="relative z-10 flex items-start justify-between">
@@ -411,7 +449,11 @@ function GlassTile({
         </div>
 
         {app.badge && (
-          <span className="rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider text-slate-300">
+          <span className={`rounded-md border px-1.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-wider ${
+            isDark
+              ? "border-white/[0.08] bg-white/[0.04] text-slate-300"
+              : "border-[#E2D9CC] bg-[#FED3C6] text-[#282937]"
+          }`}>
             {app.badge}
           </span>
         )}
@@ -419,10 +461,18 @@ function GlassTile({
 
       {/* Bottom row: Title & Description */}
       <div className="relative z-10 space-y-0.5">
-        <div className="text-[13px] font-semibold text-slate-100 group-hover:text-white transition-colors truncate">
+        <div className={`text-[13px] font-semibold transition-colors truncate ${
+          isDark
+            ? "text-slate-100 group-hover:text-white"
+            : "text-[#282937] group-hover:text-[#FA8775]"
+        }`}>
           {app.label}
         </div>
-        <div className="text-[11px] text-slate-400 group-hover:text-slate-300 transition-colors truncate">
+        <div className={`text-[11px] transition-colors truncate ${
+          isDark
+            ? "text-slate-400 group-hover:text-slate-300"
+            : "text-[#4A4B5E] group-hover:text-[#282937]"
+        }`}>
           {app.description}
         </div>
       </div>

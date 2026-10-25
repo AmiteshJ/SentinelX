@@ -53,20 +53,20 @@ const DARK = {
 };
 
 const LIGHT = {
-    bg: "#FAF9FF",
-    gradient: "linear-gradient(180deg,#FDFCFF 0%,#FAF9FF 55%,#F5F3FF 100%)",
-    blob1: "rgba(124,58,237,0.10)",
-    blob2: "rgba(196,181,253,0.20)",
-    text: "#18181B",
-    textSecondary: "#71717A",
-    textMuted: "#A1A1AA",
+    bg: "#FFF5E6",
+    gradient: "linear-gradient(180deg,#FEFBF4 0%,#FFF5E6 55%,#FDF3E3 100%)",
+    blob1: "rgba(250,135,117,0.24)",
+    blob2: "rgba(157,133,242,0.18)",
+    text: "#282937",
+    textSecondary: "#4A4B5E",
+    textMuted: "#58565E",
     surface: "#FFFFFF",
-    surfaceStrong: "#FCFAFF",
-    border: "#E9E7F2",
-    primary: "#7C3AED",
-    primaryGlow: "#A78BFA",
-    onPrimary: "#FFFFFF",
-    heroOverlay: "rgba(250,249,255,0.85)",
+    surfaceStrong: "#FEFBF4",
+    border: "#E2D9CC",
+    primary: "#282937",
+    primaryGlow: "#FA8775",
+    onPrimary: "#FFF5E6",
+    heroOverlay: "rgba(255,245,230,0.88)",
 };
 
 type Palette = typeof DARK;

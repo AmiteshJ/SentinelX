@@ -265,14 +265,14 @@ export function KnowledgeBase() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20">
                 <BookOpen size={18} />
               </span>
-              <h1 className="text-xl font-bold tracking-tight text-slate-100 sm:text-2xl">
+              <h1 className="text-xl font-bold tracking-tight text-[#282937] dark:text-slate-100 sm:text-2xl">
                 RAG Knowledge Base &amp; Vector Store
               </h1>
             </div>
-            <p className="mt-1 text-xs text-slate-400 sm:text-sm">
+            <p className="mt-1 text-xs text-[#58565e] dark:text-slate-400 sm:text-sm">
               Vectorized threat intelligence, MITRE SOPs, and incident playbooks indexed in PostgreSQL (pgvector).
               Provides zero-hallucination factual grounding for the Groq AI SOC Assistant.
             </p>
@@ -282,7 +282,7 @@ export function KnowledgeBase() {
             <button
               onClick={() => loadData(true)}
               disabled={refreshing}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-300 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-slate-700 hover:text-[#282937] dark:hover:text-white transition-colors cursor-pointer shadow-xs"
             >
               <RefreshCw size={13} className={refreshing ? "animate-spin" : ""} />
               Refresh
@@ -291,10 +291,10 @@ export function KnowledgeBase() {
             <button
               onClick={handleSeedDefaults}
               disabled={seeding}
-              className="flex items-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/30 px-3 py-1.5 text-xs font-medium text-emerald-300 hover:bg-emerald-900/40 hover:border-emerald-500/50 transition-colors shadow-sm cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg border border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-1.5 text-xs font-medium text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 transition-colors shadow-xs cursor-pointer"
               title="Pre-load MITRE T1059, Reverse Shell, Ransomware, and Zero-Day SOPs"
             >
-              <Sparkles size={13} className={seeding ? "animate-spin" : "text-emerald-400"} />
+              <Sparkles size={13} className={seeding ? "animate-spin" : "text-emerald-600 dark:text-emerald-400"} />
               {seeding ? "Seeding Vectors..." : "Seed SOC Playbooks"}
             </button>
 
@@ -303,7 +303,7 @@ export function KnowledgeBase() {
                 setShowUploadModal(true);
                 setModalTab("upload");
               }}
-              className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-indigo-600/25 hover:bg-indigo-500 transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-lg bg-[#fa8775] dark:bg-indigo-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-[#f76d57] dark:hover:bg-indigo-500 transition-colors cursor-pointer"
             >
               <Plus size={14} />
               Ingest Document
@@ -320,21 +320,21 @@ export function KnowledgeBase() {
               exit={{ opacity: 0, y: -8 }}
               className={`flex items-center justify-between rounded-xl border p-3.5 text-xs font-medium ${
                 actionMessage.type === "success"
-                  ? "border-emerald-500/30 bg-emerald-950/20 text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.1)]"
-                  : "border-red-500/30 bg-red-950/20 text-red-300 shadow-[0_0_20px_rgba(239,68,68,0.1)]"
+                  ? "border-emerald-300 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/20 text-emerald-900 dark:text-emerald-300 shadow-xs"
+                  : "border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-300 shadow-xs"
               }`}
             >
               <div className="flex items-center gap-2">
                 {actionMessage.type === "success" ? (
-                  <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+                  <CheckCircle2 size={16} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
                 ) : (
-                  <AlertCircle size={16} className="text-red-400 shrink-0" />
+                  <AlertCircle size={16} className="text-red-600 dark:text-red-400 shrink-0" />
                 )}
                 <span>{actionMessage.text}</span>
               </div>
               <button
                 onClick={() => setActionMessage(null)}
-                className="text-slate-400 hover:text-white transition-colors cursor-pointer"
+                className="text-[#58565e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white transition-colors cursor-pointer"
               >
                 <X size={14} />
               </button>
@@ -344,49 +344,49 @@ export function KnowledgeBase() {
 
         {/* Hardware & Vector Engine Telemetry Cards */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 backdrop-blur-md">
+          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Total Indexed Documents</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-400">
+              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Total Indexed Documents</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 <FileText size={15} />
               </span>
             </div>
-            <div className="mt-2 text-2xl font-bold text-slate-100">
+            <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
               {stats ? stats.total_documents : "--"}
             </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-400" />
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
               <span>{stats ? `${stats.total_sources} categories` : "Loading..."}</span>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 backdrop-blur-md">
+          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Vector Embeddings</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-400">
+              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Embeddings</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
                 <Layers size={15} />
               </span>
             </div>
-            <div className="mt-2 text-2xl font-bold text-slate-100">
+            <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
               {stats ? stats.total_chunks : "--"}
             </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-400" />
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500" />
               <span>{stats ? `${stats.vector_dimension}-dimensional vectors` : "384-dim"}</span>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 backdrop-blur-md">
+          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Active Embedding Model</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Active Embedding Model</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <Cpu size={15} />
               </span>
             </div>
-            <div className="mt-2 text-sm font-bold text-slate-100 truncate" title={stats?.embedding_model}>
+            <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100 truncate" title={stats?.embedding_model}>
               {stats ? stats.embedding_model.split(" ")[0] : "all-MiniLM-L6-v2"}
             </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-400">
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
@@ -395,35 +395,35 @@ export function KnowledgeBase() {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-gradient-to-b from-white/[0.04] to-transparent p-4 backdrop-blur-md">
+          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-slate-400">Vector Store &amp; Index</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-400">
+              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Store &amp; Index</span>
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 <Database size={15} />
               </span>
             </div>
-            <div className="mt-2 text-sm font-bold text-slate-100">
+            <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100">
               PostgreSQL (Neon)
             </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-400" />
+            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
               <span>pgvector IVFFlat (Cosine Ops)</span>
             </div>
           </div>
         </div>
 
         {/* Semantic Search & Vector Retrieval Sandbox */}
-        <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/20 to-slate-900/60 p-5 backdrop-blur-xl shadow-xl">
-          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-white/[0.08] pb-3 mb-4">
+        <div className="rounded-2xl border border-[#e2d9cc] dark:border-indigo-500/20 bg-white/95 dark:bg-gradient-to-b dark:from-indigo-950/20 dark:to-slate-900/60 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-xl">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between border-b border-[#e2d9cc] dark:border-white/[0.08] pb-3 mb-4">
             <div className="flex items-center gap-2">
-              <span className="flex h-6 w-6 items-center justify-center rounded bg-indigo-500/20 text-indigo-400">
+              <span className="flex h-6 w-6 items-center justify-center rounded bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400">
                 <Search size={14} />
               </span>
-              <h2 className="text-sm font-semibold text-slate-100">
+              <h2 className="text-sm font-semibold text-[#282937] dark:text-slate-100">
                 Interactive Vector Search Sandbox
               </h2>
             </div>
-            <span className="text-[11px] text-slate-400">
+            <span className="text-[11px] text-[#58565e] dark:text-slate-400">
               Tests cosine similarity directly against the 384-dim pgvector index
             </span>
           </div>
@@ -432,13 +432,13 @@ export function KnowledgeBase() {
             <div className="relative flex-1">
               <Search
                 size={14}
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#58565e] dark:text-slate-400"
               />
               <input
                 value={testQuery}
                 onChange={(e) => setTestQuery(e.target.value)}
                 placeholder="Ask a technical question (e.g., 'What steps should I take if port 4444 is beaconing?' or 'Ransomware containment checklist')"
-                className="w-full rounded-xl border border-slate-700 bg-black/40 py-2.5 pl-9 pr-4 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50"
+                className="w-full rounded-xl border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 py-2.5 pl-9 pr-4 text-xs text-[#282937] dark:text-slate-100 placeholder:text-[#888691] dark:placeholder-slate-500 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 shadow-xs"
               />
             </div>
 
@@ -446,17 +446,17 @@ export function KnowledgeBase() {
               <select
                 value={topK}
                 onChange={(e) => setTopK(Number(e.target.value))}
-                className="rounded-xl border border-slate-700 bg-black/40 px-3 py-2.5 text-xs text-slate-200 outline-none focus:border-indigo-500"
+                className="rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-[#0b111e] px-3.5 py-2.5 text-xs text-[#282937] dark:text-slate-200 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 cursor-pointer shadow-xs"
               >
-                <option value={3}>Top 3</option>
-                <option value={5}>Top 5</option>
-                <option value={8}>Top 8</option>
+                <option value={3} className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Top 3 Results</option>
+                <option value={5} className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Top 5 Results</option>
+                <option value={8} className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Top 8 Results</option>
               </select>
 
               <button
                 type="submit"
                 disabled={searching || !testQuery.trim()}
-                className="rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-1.5"
+                className="rounded-xl bg-[#fa8775] dark:bg-indigo-600 px-5 py-2.5 text-xs font-semibold text-white shadow-sm hover:bg-[#f76d57] dark:hover:bg-indigo-500 disabled:opacity-50 transition-colors cursor-pointer flex items-center gap-1.5"
               >
                 {searching ? (
                   <>
@@ -486,7 +486,7 @@ export function KnowledgeBase() {
                 key={prompt}
                 type="button"
                 onClick={() => setTestQuery(prompt)}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-slate-300 hover:border-indigo-500/40 hover:bg-indigo-500/10 hover:text-white transition-colors cursor-pointer"
+                className="rounded-lg border border-[#e2d9cc] dark:border-white/[0.08] bg-[#f8f4ec] dark:bg-white/[0.03] px-2.5 py-1 text-[#282937] dark:text-slate-300 hover:border-[#fa8775]/50 hover:bg-white dark:hover:bg-indigo-500/10 hover:text-[#282937] dark:hover:text-white transition-colors cursor-pointer shadow-2xs"
               >
                 {prompt}
               </button>
@@ -495,21 +495,21 @@ export function KnowledgeBase() {
 
           {/* Search Results Display */}
           {searchResults && (
-            <div className="mt-4 pt-4 border-t border-white/[0.08]">
+            <div className="mt-4 pt-4 border-t border-[#e2d9cc] dark:border-white/[0.08]">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-medium text-slate-300">
-                  Retrieved {searchResults.length} matching chunks for: <span className="text-indigo-400 italic font-mono">"{testQuery}"</span>
+                <span className="text-xs font-medium text-[#282937] dark:text-slate-300">
+                  Retrieved {searchResults.length} matching chunks for: <span className="text-indigo-600 dark:text-indigo-400 italic font-mono font-semibold">"{testQuery}"</span>
                 </span>
                 <button
                   onClick={() => setSearchResults(null)}
-                  className="text-[11px] text-slate-500 hover:text-slate-300 cursor-pointer"
+                  className="text-[11px] text-[#58565e] dark:text-slate-500 hover:text-[#282937] dark:hover:text-slate-300 cursor-pointer"
                 >
                   Clear results
                 </button>
               </div>
 
               {searchResults.length === 0 ? (
-                <div className="rounded-xl border border-white/5 bg-black/20 p-6 text-center text-xs text-slate-400">
+                <div className="rounded-xl border border-[#e2d9cc] dark:border-white/5 bg-[#f8f4ec] dark:bg-black/20 p-6 text-center text-xs text-[#58565e] dark:text-slate-400">
                   No vectors matched this query. Try lowering Top-K or seeding default playbooks.
                 </div>
               ) : (
@@ -518,10 +518,10 @@ export function KnowledgeBase() {
                     const simPercent = Math.round(res.similarity * 100);
                     const simBadgeColor =
                       simPercent >= 80
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                        ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
                         : simPercent >= 65
-                        ? "bg-cyan-500/10 text-cyan-400 border-cyan-500/30"
-                        : "bg-amber-500/10 text-amber-400 border-amber-500/30";
+                        ? "bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border-cyan-500/30"
+                        : "bg-amber-500/10 text-amber-800 dark:text-amber-400 border-amber-500/30";
 
                     return (
                       <motion.div
@@ -529,19 +529,19 @@ export function KnowledgeBase() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="flex flex-col justify-between rounded-xl border border-white/10 bg-black/30 p-3.5 hover:border-indigo-500/40 transition-colors"
+                        className="flex flex-col justify-between rounded-xl border border-[#e2d9cc] dark:border-white/10 bg-white dark:bg-black/30 p-3.5 hover:border-[#fa8775] dark:hover:border-indigo-500/40 shadow-xs transition-colors"
                       >
                         <div>
                           <div className="flex items-start justify-between gap-2 mb-2">
                             <div className="min-w-0">
-                              <span className="text-xs font-semibold text-slate-200 line-clamp-1">
+                              <span className="text-xs font-semibold text-[#282937] dark:text-slate-200 line-clamp-1">
                                 {res.document_title}
                               </span>
                               <div className="flex items-center gap-1.5 mt-0.5">
-                                <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] uppercase font-mono text-slate-400">
+                                <span className="rounded bg-[#f8f4ec] dark:bg-slate-800 px-1.5 py-0.5 text-[10px] uppercase font-mono text-[#58565e] dark:text-slate-400 border border-[#e2d9cc] dark:border-transparent">
                                   {res.source}
                                 </span>
-                                <span className="text-[10px] text-slate-500">
+                                <span className="text-[10px] text-[#58565e] dark:text-slate-500">
                                   Chunk #{res.chunk_index}
                                 </span>
                               </div>
@@ -552,19 +552,19 @@ export function KnowledgeBase() {
                               {simPercent}% Match
                             </span>
                           </div>
-                          <p className="text-[11px] leading-relaxed text-slate-300 line-clamp-4 font-mono bg-black/40 p-2.5 rounded-lg border border-white/5">
+                          <p className="text-[11px] leading-relaxed text-[#282937] dark:text-slate-300 line-clamp-4 font-mono bg-[#f8f4ec] dark:bg-black/40 p-2.5 rounded-lg border border-[#e2d9cc] dark:border-white/5">
                             {res.content}
                           </p>
                         </div>
 
-                        <div className="mt-3 flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-slate-500">
+                        <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#e2d9cc]/60 dark:border-white/5 text-[10px] text-[#58565e] dark:text-slate-500">
                           <span>Similarity: {res.similarity.toFixed(4)}</span>
                           <button
                             type="button"
                             onClick={() => {
                               navigate(`/ai-assistant?prompt=${encodeURIComponent(testQuery)}`);
                             }}
-                            className="flex items-center gap-1 text-indigo-400 hover:text-indigo-300 font-medium transition-colors cursor-pointer"
+                            className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold transition-colors cursor-pointer"
                           >
                             <span>Query AI SOC Assistant</span>
                             <ExternalLink size={10} />
@@ -580,29 +580,29 @@ export function KnowledgeBase() {
         </div>
 
         {/* Document Repository & Management Table */}
-        <div className="rounded-2xl border border-white/10 bg-[#080e1e]/80 p-5 backdrop-blur-xl shadow-xl">
+        <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-[#080e1e]/80 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-xl">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
             <div>
-              <h2 className="text-sm font-semibold text-slate-100 flex items-center gap-2">
-                <FileCode size={16} className="text-indigo-400" />
+              <h2 className="text-sm font-semibold text-[#282937] dark:text-slate-100 flex items-center gap-2">
+                <FileCode size={16} className="text-indigo-600 dark:text-indigo-400" />
                 Ingested Security Documents ({filteredDocs.length})
               </h2>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-[#58565e] dark:text-slate-400 mt-0.5">
                 All documents currently partitioned into 800-character vector chunks in the Neon database
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
               {/* Category Filter Tabs */}
-              <div className="flex items-center rounded-lg border border-slate-700 bg-black/40 p-1 text-xs">
+              <div className="flex items-center rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-[#f8f4ec] dark:bg-black/40 p-1 text-xs">
                 {["all", "playbook", "mitre", "internal_doc"].map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedSource(cat)}
                     className={`rounded-md px-2.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${
                       selectedSource === cat
-                        ? "bg-indigo-600 text-white"
-                        : "text-slate-400 hover:text-slate-200"
+                        ? "bg-[#282937] dark:bg-indigo-600 text-white shadow-xs"
+                        : "text-[#58565e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-slate-200"
                     }`}
                   >
                     {cat === "all" ? "All" : cat.toUpperCase()}
@@ -612,12 +612,12 @@ export function KnowledgeBase() {
 
               {/* Search Bar */}
               <div className="relative">
-                <Search size={13} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Search size={13} className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-[#58565e] dark:text-slate-500" />
                 <input
                   value={searchFilter}
                   onChange={(e) => setSearchFilter(e.target.value)}
                   placeholder="Filter documents..."
-                  className="rounded-lg border border-slate-700 bg-black/40 py-1.5 pl-7 pr-3 text-xs text-slate-200 placeholder-slate-500 outline-none focus:border-indigo-500"
+                  className="rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 py-1.5 pl-7 pr-3 text-xs text-[#282937] dark:text-slate-200 placeholder:text-[#888691] dark:placeholder-slate-500 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 shadow-xs"
                 />
               </div>
             </div>
@@ -626,28 +626,28 @@ export function KnowledgeBase() {
           {/* Table */}
           {loading ? (
             <div className="flex h-48 items-center justify-center">
-              <RefreshCw size={24} className="animate-spin text-indigo-400" />
+              <RefreshCw size={24} className="animate-spin text-indigo-500" />
             </div>
           ) : filteredDocs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700/60 p-10 text-center">
-              <BookOpen size={36} className="text-slate-600 mb-2" />
-              <div className="text-xs font-semibold text-slate-300">No documents found</div>
-              <p className="text-[11px] text-slate-500 mt-1 max-w-sm">
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#e2d9cc] dark:border-slate-700/60 p-10 text-center">
+              <BookOpen size={36} className="text-[#888691] dark:text-slate-600 mb-2" />
+              <div className="text-xs font-semibold text-[#282937] dark:text-slate-300">No documents found</div>
+              <p className="text-[11px] text-[#58565e] dark:text-slate-500 mt-1 max-w-sm">
                 Get started by clicking <strong>"Seed SOC Playbooks"</strong> above or uploading custom security documentation.
               </p>
               <button
                 onClick={handleSeedDefaults}
                 disabled={seeding}
-                className="mt-4 flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-lg shadow-emerald-600/20 hover:bg-emerald-500 transition-colors cursor-pointer"
+                className="mt-4 flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3.5 py-1.5 text-xs font-semibold text-white shadow-sm hover:bg-emerald-500 transition-colors cursor-pointer"
               >
                 <Sparkles size={13} />
                 Seed Standard SOC Playbooks
               </button>
             </div>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-white/5 bg-black/20">
+            <div className="overflow-x-auto rounded-xl border border-[#e2d9cc] dark:border-white/5 bg-white dark:bg-black/20 shadow-xs">
               <table className="w-full text-left text-xs">
-                <thead className="border-b border-white/10 bg-white/[0.02] text-[11px] uppercase tracking-wider text-slate-400">
+                <thead className="border-b border-[#e2d9cc] dark:border-white/10 bg-[#f8f4ec] dark:bg-white/[0.02] text-[11px] uppercase tracking-wider text-[#58565e] dark:text-slate-400">
                   <tr>
                     <th className="px-4 py-3 font-medium">Document Title</th>
                     <th className="px-4 py-3 font-medium">Source Type</th>
@@ -656,20 +656,20 @@ export function KnowledgeBase() {
                     <th className="px-4 py-3 font-medium text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-white/5 text-slate-300">
+                <tbody className="divide-y divide-[#e2d9cc]/60 dark:divide-white/5 text-[#282937] dark:text-slate-300">
                   {filteredDocs.map((doc) => {
                     const sourceBadge =
                       doc.source === "mitre"
-                        ? "bg-purple-500/10 text-purple-400 border-purple-500/30"
+                        ? "bg-purple-500/10 text-purple-700 dark:text-purple-400 border-purple-500/30"
                         : doc.source === "playbook"
-                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/30";
+                        ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30"
+                        : "bg-blue-500/10 text-blue-700 dark:text-blue-400 border-blue-500/30";
 
                     return (
-                      <tr key={doc.document_title} className="hover:bg-white/[0.02] transition-colors">
-                        <td className="px-4 py-3 font-medium text-slate-100 flex items-center gap-2">
-                          <FileText size={15} className="text-slate-400 shrink-0" />
-                          <span className="truncate max-w-md">{doc.document_title}</span>
+                      <tr key={doc.document_title} className="hover:bg-[#f8f4ec] dark:hover:bg-white/[0.02] transition-colors">
+                        <td className="px-4 py-3 font-medium text-[#282937] dark:text-slate-100 flex items-center gap-2">
+                          <FileText size={15} className="text-[#58565e] dark:text-slate-400 shrink-0" />
+                          <span className="truncate max-w-md font-semibold">{doc.document_title}</span>
                         </td>
                         <td className="px-4 py-3">
                           <span
@@ -679,19 +679,19 @@ export function KnowledgeBase() {
                           </span>
                         </td>
                         <td className="px-4 py-3">
-                          <span className="flex items-center gap-1 font-mono text-slate-200">
-                            <Layers size={13} className="text-indigo-400" />
+                          <span className="flex items-center gap-1 font-mono text-[#282937] dark:text-slate-200">
+                            <Layers size={13} className="text-indigo-600 dark:text-indigo-400" />
                             {doc.chunk_count} {doc.chunk_count === 1 ? "chunk" : "chunks"}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-slate-400 text-[11px]">
+                        <td className="px-4 py-3 text-[#58565e] dark:text-slate-400 text-[11px]">
                           {new Date(doc.created_at).toLocaleString()}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => handleInspectDoc(doc.document_title)}
-                              className="flex items-center gap-1 rounded-md border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-[11px] text-slate-300 hover:bg-slate-700 hover:text-white transition-colors cursor-pointer"
+                              className="flex items-center gap-1 rounded-md border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-slate-800/80 px-2.5 py-1 text-[11px] text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-xs"
                               title="Inspect vector chunks"
                             >
                               <Eye size={12} />
@@ -699,7 +699,7 @@ export function KnowledgeBase() {
                             </button>
                             <button
                               onClick={() => handleDeleteDoc(doc.document_title)}
-                              className="flex items-center gap-1 rounded-md border border-red-500/30 bg-red-950/20 px-2 py-1 text-[11px] text-red-400 hover:bg-red-900/40 hover:text-red-300 transition-colors cursor-pointer"
+                              className="flex items-center gap-1 rounded-md border border-red-300 dark:border-red-500/30 bg-red-50 dark:bg-red-950/20 px-2 py-1 text-[11px] text-red-700 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors cursor-pointer shadow-xs"
                               title="Delete from pgvector"
                             >
                               <Trash2 size={12} />
@@ -716,16 +716,16 @@ export function KnowledgeBase() {
         </div>
 
         {/* AI SOC Assistant Bridge Banner */}
-        <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-r from-indigo-950/30 via-slate-900/60 to-purple-950/30 p-5 backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="rounded-2xl border border-[#e2d9cc] dark:border-indigo-500/20 bg-white/95 dark:bg-gradient-to-r dark:from-indigo-950/30 dark:via-slate-900/60 dark:to-purple-950/30 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-xl flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 shadow-lg shadow-indigo-500/20">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 border border-indigo-500/30 shadow-sm">
               <Sparkles size={20} />
             </span>
             <div>
-              <h3 className="text-xs font-semibold text-slate-200">
+              <h3 className="text-xs font-semibold text-[#282937] dark:text-slate-200">
                 Grounding the SentinelX AI SOC Assistant
               </h3>
-              <p className="text-[11px] text-slate-400 mt-0.5">
+              <p className="text-[11px] text-[#58565e] dark:text-slate-400 mt-0.5">
                 Every prompt asked in the AI Assistant automatically performs a top-3 cosine distance retrieval
                 over these vectors, preventing LLM hallucination and enforcing adherence to your organizational SOPs.
               </p>
@@ -733,7 +733,7 @@ export function KnowledgeBase() {
           </div>
           <button
             onClick={() => navigate("/ai-assistant")}
-            className="flex items-center gap-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2 text-xs font-semibold text-slate-200 hover:text-white transition-colors shrink-0 cursor-pointer"
+            className="flex items-center gap-2 rounded-xl bg-[#fa8775] dark:bg-slate-800 hover:bg-[#f76d57] dark:hover:bg-slate-700 border border-transparent dark:border-slate-700 px-4 py-2 text-xs font-semibold text-white transition-colors shrink-0 cursor-pointer shadow-xs"
           >
             <span>Open AI Assistant</span>
             <ArrowRight size={13} />
@@ -756,39 +756,39 @@ export function KnowledgeBase() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative z-10 w-full max-w-2xl rounded-2xl border border-white/15 bg-[#0a0f1d] p-6 shadow-2xl overflow-hidden"
+              className="relative z-10 w-full max-w-2xl rounded-2xl border border-[#e2d9cc] dark:border-white/15 bg-white dark:bg-[#0a0f1d] p-6 shadow-2xl overflow-hidden text-[#282937] dark:text-slate-100"
             >
-              <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+              <div className="flex items-center justify-between border-b border-[#e2d9cc] dark:border-white/10 pb-4 mb-4">
                 <div className="flex items-center gap-2">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
                     <Plus size={16} />
                   </span>
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100">
+                    <h2 className="text-sm font-semibold text-[#282937] dark:text-slate-100">
                       Ingest Document into pgvector
                     </h2>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-[#58565e] dark:text-slate-400">
                       Partitioned into 800-character chunks with 384-dimensional embeddings
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => !submitting && setShowUploadModal(false)}
-                  className="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="rounded-lg p-1 text-[#58565e] dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-[#282937] dark:hover:text-white cursor-pointer"
                 >
                   <X size={16} />
                 </button>
               </div>
 
               {/* Tabs */}
-              <div className="flex items-center gap-2 border-b border-white/10 pb-3 mb-4">
+              <div className="flex items-center gap-2 border-b border-[#e2d9cc] dark:border-white/10 pb-3 mb-4">
                 <button
                   type="button"
                   onClick={() => setModalTab("upload")}
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
                     modalTab === "upload"
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                      ? "bg-[#282937] dark:bg-indigo-600 text-white shadow-xs"
+                      : "text-[#58565e] dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#282937] dark:hover:text-slate-200"
                   }`}
                 >
                   <UploadCloud size={14} />
@@ -799,8 +799,8 @@ export function KnowledgeBase() {
                   onClick={() => setModalTab("manual")}
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
                     modalTab === "manual"
-                      ? "bg-indigo-600 text-white shadow-sm"
-                      : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+                      ? "bg-[#282937] dark:bg-indigo-600 text-white shadow-xs"
+                      : "text-[#58565e] dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/5 hover:text-[#282937] dark:hover:text-slate-200"
                   }`}
                 >
                   <FileText size={14} />
@@ -812,11 +812,11 @@ export function KnowledgeBase() {
               {modalTab === "upload" && (
                 <form onSubmit={handleFileUpload} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-300 mb-1">
+                    <label className="block text-xs font-medium text-[#282937] dark:text-slate-300 mb-1">
                       Choose Document File
                     </label>
-                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-slate-700 bg-black/30 p-6 hover:border-indigo-500/50 transition-colors">
-                      <UploadCloud size={32} className="text-slate-500 mb-2" />
+                    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#e2d9cc] dark:border-slate-700 bg-[#f8f4ec] dark:bg-black/30 p-6 hover:border-[#fa8775]/50 dark:hover:border-indigo-500/50 transition-colors">
+                      <UploadCloud size={32} className="text-[#888691] dark:text-slate-500 mb-2" />
                       <input
                         type="file"
                         required
@@ -829,9 +829,9 @@ export function KnowledgeBase() {
                             }
                           }
                         }}
-                        className="text-xs text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-indigo-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-indigo-500 cursor-pointer"
+                        className="text-xs text-[#58565e] dark:text-slate-400 file:mr-3 file:rounded-lg file:border-0 file:bg-[#fa8775] dark:file:bg-indigo-600 file:px-3 file:py-1 file:text-xs file:font-semibold file:text-white hover:file:bg-[#f76d57] dark:hover:file:bg-indigo-500 cursor-pointer shadow-xs"
                       />
-                      <span className="text-[10px] text-slate-500 mt-2">
+                      <span className="text-[10px] text-[#58565e] dark:text-slate-500 mt-2">
                         Supports text files, markdown incident logs, and security whitepapers
                       </span>
                     </div>
@@ -839,47 +839,47 @@ export function KnowledgeBase() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-[#282937] dark:text-slate-300 mb-1">
                         Document Title (Optional override)
                       </label>
                       <input
                         value={uploadTitle}
                         onChange={(e) => setUploadTitle(e.target.value)}
                         placeholder="e.g. Q3 Threat Intel Brief"
-                        className="w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-500"
+                        className="w-full rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 px-3 py-2 text-xs text-[#282937] dark:text-slate-100 placeholder:text-[#888691] dark:placeholder:text-slate-500 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-[#282937] dark:text-slate-300 mb-1">
                         Source Category
                       </label>
                       <select
                         value={uploadSource}
                         onChange={(e) => setUploadSource(e.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-500"
+                        className="w-full rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-[#0b111e] px-3.5 py-2 text-xs text-[#282937] dark:text-slate-100 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 cursor-pointer shadow-xs"
                       >
-                        <option value="internal_doc">Internal Doc</option>
-                        <option value="playbook">Playbook / SOP</option>
-                        <option value="mitre">MITRE ATT&amp;CK</option>
-                        <option value="incident_report">Incident Report</option>
-                        <option value="nvd">NVD / CVE Advisory</option>
+                        <option value="internal_doc" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Internal Doc</option>
+                        <option value="playbook" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Playbook / SOP</option>
+                        <option value="mitre" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">MITRE ATT&amp;CK</option>
+                        <option value="incident_report" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Incident Report</option>
+                        <option value="nvd" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">NVD / CVE Advisory</option>
                       </select>
                     </div>
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                  <div className="flex justify-end gap-2 pt-3 border-t border-[#e2d9cc] dark:border-white/10">
                     <button
                       type="button"
                       disabled={submitting}
                       onClick={() => setShowUploadModal(false)}
-                      className="rounded-lg border border-slate-700 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/5 cursor-pointer"
+                      className="rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-medium text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-white/5 cursor-pointer shadow-xs"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={submitting || !uploadFile}
-                      className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-lg bg-[#fa8775] dark:bg-indigo-600 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#f76d57] dark:hover:bg-indigo-500 disabled:opacity-50 cursor-pointer"
                     >
                       {submitting ? (
                         <>
@@ -902,7 +902,7 @@ export function KnowledgeBase() {
                 <form onSubmit={handleManualIngest} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-[#282937] dark:text-slate-300 mb-1">
                         Document Title *
                       </label>
                       <input
@@ -910,33 +910,33 @@ export function KnowledgeBase() {
                         value={manualTitle}
                         onChange={(e) => setManualTitle(e.target.value)}
                         placeholder="e.g. Reverse Shell Response Playbook"
-                        className="w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-500"
+                        className="w-full rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 px-3 py-2 text-xs text-[#282937] dark:text-slate-100 placeholder:text-[#888691] outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 shadow-xs"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-slate-300 mb-1">
+                      <label className="block text-xs font-medium text-[#282937] dark:text-slate-300 mb-1">
                         Source Category
                       </label>
                       <select
                         value={manualSource}
                         onChange={(e) => setManualSource(e.target.value)}
-                        className="w-full rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 outline-none focus:border-indigo-500"
+                        className="w-full rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-[#0b111e] px-3.5 py-2 text-xs text-[#282937] dark:text-slate-100 outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 cursor-pointer shadow-xs"
                       >
-                        <option value="playbook">Playbook / SOP</option>
-                        <option value="mitre">MITRE ATT&amp;CK</option>
-                        <option value="internal_doc">Internal Doc</option>
-                        <option value="incident_report">Incident Report</option>
-                        <option value="nvd">NVD / CVE Advisory</option>
+                        <option value="playbook" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Playbook / SOP</option>
+                        <option value="mitre" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">MITRE ATT&amp;CK</option>
+                        <option value="internal_doc" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Internal Doc</option>
+                        <option value="incident_report" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">Incident Report</option>
+                        <option value="nvd" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">NVD / CVE Advisory</option>
                       </select>
                     </div>
                   </div>
 
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="block text-xs font-medium text-slate-300">
+                      <label className="block text-xs font-medium text-[#282937] dark:text-slate-300">
                         Content / Markdown Text *
                       </label>
-                      <span className="text-[10px] text-indigo-400 font-mono">
+                      <span className="text-[10px] text-indigo-600 dark:text-indigo-400 font-mono font-medium">
                         {manualContent.length} chars &bull; ~{estimatedChunks} chunks
                       </span>
                     </div>
@@ -946,23 +946,23 @@ export function KnowledgeBase() {
                       value={manualContent}
                       onChange={(e) => setManualContent(e.target.value)}
                       placeholder="Paste incident playbook, MITRE detection logic, containment protocols, or policy guidelines here..."
-                      className="w-full rounded-lg border border-slate-700 bg-black/40 p-3 font-mono text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50"
+                      className="w-full rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 p-3 font-mono text-xs text-[#282937] dark:text-slate-100 placeholder:text-[#888691] outline-none focus:border-[#fa8775] dark:focus:border-indigo-500 focus:ring-1 focus:ring-[#fa8775]/50 dark:focus:ring-indigo-500/50 shadow-xs"
                     />
                   </div>
 
-                  <div className="flex justify-end gap-2 pt-3 border-t border-white/10">
+                  <div className="flex justify-end gap-2 pt-3 border-t border-[#e2d9cc] dark:border-white/10">
                     <button
                       type="button"
                       disabled={submitting}
                       onClick={() => setShowUploadModal(false)}
-                      className="rounded-lg border border-slate-700 px-4 py-2 text-xs font-medium text-slate-300 hover:bg-white/5 cursor-pointer"
+                      className="rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-medium text-[#282937] dark:text-slate-300 hover:bg-[#f8f4ec] dark:hover:bg-white/5 cursor-pointer shadow-xs"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={submitting || !manualTitle.trim() || !manualContent.trim()}
-                      className="flex items-center gap-1.5 rounded-lg bg-indigo-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-indigo-600/30 hover:bg-indigo-500 disabled:opacity-50 cursor-pointer"
+                      className="flex items-center gap-1.5 rounded-lg bg-[#fa8775] dark:bg-indigo-600 px-5 py-2 text-xs font-semibold text-white shadow-sm hover:bg-[#f76d57] dark:hover:bg-indigo-500 disabled:opacity-50 cursor-pointer"
                     >
                       {submitting ? (
                         <>
@@ -999,25 +999,25 @@ export function KnowledgeBase() {
               initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              className="relative z-10 flex flex-col max-h-[85vh] w-full max-w-3xl rounded-2xl border border-white/15 bg-[#0a0f1d] shadow-2xl overflow-hidden"
+              className="relative z-10 flex flex-col max-h-[85vh] w-full max-w-3xl rounded-2xl border border-[#e2d9cc] dark:border-white/15 bg-white dark:bg-[#0a0f1d] shadow-2xl overflow-hidden text-[#282937] dark:text-slate-100"
             >
-              <div className="flex items-center justify-between border-b border-white/10 p-5">
+              <div className="flex items-center justify-between border-b border-[#e2d9cc] dark:border-white/10 p-5">
                 <div className="flex items-center gap-2.5">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-500/15 text-indigo-600 dark:text-indigo-400">
                     <Layers size={18} />
                   </span>
                   <div>
-                    <h2 className="text-sm font-semibold text-slate-100 line-clamp-1">
+                    <h2 className="text-sm font-semibold text-[#282937] dark:text-slate-100 line-clamp-1">
                       {selectedDocTitle}
                     </h2>
-                    <p className="text-[11px] text-slate-400">
+                    <p className="text-[11px] text-[#58565e] dark:text-slate-400">
                       Partitioned Vector Chunks ({inspectChunks.length} chunks indexed)
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowChunkModal(false)}
-                  className="rounded-lg p-1.5 text-slate-400 hover:bg-white/10 hover:text-white cursor-pointer"
+                  className="rounded-lg p-1.5 text-[#58565e] dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/10 hover:text-[#282937] dark:hover:text-white cursor-pointer"
                 >
                   <X size={16} />
                 </button>
@@ -1026,29 +1026,29 @@ export function KnowledgeBase() {
               <div className="flex-1 overflow-y-auto p-5 space-y-3">
                 {loadingChunks ? (
                   <div className="flex h-40 items-center justify-center">
-                    <RefreshCw size={24} className="animate-spin text-indigo-400" />
+                    <RefreshCw size={24} className="animate-spin text-indigo-500" />
                   </div>
                 ) : inspectChunks.length === 0 ? (
-                  <div className="text-center text-xs text-slate-400 py-10">
+                  <div className="text-center text-xs text-[#58565e] dark:text-slate-400 py-10">
                     No chunks found for this document.
                   </div>
                 ) : (
                   inspectChunks.map((chunk) => (
                     <div
                       key={chunk.id || chunk.chunk_index}
-                      className="rounded-xl border border-white/10 bg-black/40 p-4"
+                      className="rounded-xl border border-[#e2d9cc] dark:border-white/10 bg-[#fefbf4] dark:bg-black/40 p-4 shadow-2xs"
                     >
-                      <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-2 text-[11px]">
-                        <span className="font-mono font-bold text-indigo-400">
+                      <div className="flex items-center justify-between border-b border-[#e2d9cc]/60 dark:border-white/5 pb-2 mb-2 text-[11px]">
+                        <span className="font-mono font-bold text-indigo-700 dark:text-indigo-400">
                           Chunk #{chunk.chunk_index}
                         </span>
-                        <div className="flex items-center gap-2 text-slate-500">
+                        <div className="flex items-center gap-2 text-[#58565e] dark:text-slate-500">
                           <span>{chunk.content.length} chars</span>
                           <span>&bull;</span>
-                          <span className="font-mono text-[10px] text-slate-400">ID: {chunk.id?.slice(0, 8)}...</span>
+                          <span className="font-mono text-[10px] text-[#58565e] dark:text-slate-400">ID: {chunk.id?.slice(0, 8)}...</span>
                         </div>
                       </div>
-                      <p className="font-mono text-xs leading-relaxed text-slate-300 whitespace-pre-wrap">
+                      <p className="font-mono text-xs leading-relaxed text-[#282937] dark:text-slate-300 whitespace-pre-wrap">
                         {chunk.content}
                       </p>
                     </div>
@@ -1056,10 +1056,10 @@ export function KnowledgeBase() {
                 )}
               </div>
 
-              <div className="border-t border-white/10 p-4 bg-white/[0.02] flex justify-end">
+              <div className="border-t border-[#e2d9cc] dark:border-white/10 p-4 bg-[#f8f4ec] dark:bg-white/[0.02] flex justify-end">
                 <button
                   onClick={() => setShowChunkModal(false)}
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-4 py-1.5 text-xs font-medium text-slate-200 hover:bg-slate-700 cursor-pointer"
+                  className="rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-1.5 text-xs font-medium text-[#282937] dark:text-slate-200 hover:bg-[#f1ebe0] dark:hover:bg-slate-700 cursor-pointer shadow-xs"
                 >
                   Close
                 </button>

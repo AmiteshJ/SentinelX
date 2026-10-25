@@ -101,7 +101,7 @@ export function TopBar() {
             className="flex items-center gap-2 rounded-lg transition-opacity hover:opacity-80"
           >
             <ShieldCheck className="text-sx-blue" size={18} />
-            <span className="text-sm font-semibold tracking-wide text-slate-100">SentinelX</span>
+            <span className="text-sm font-semibold tracking-wide text-slate-800 dark:text-slate-100">SentinelX</span>
           </Link>
         </div>
 
@@ -113,15 +113,15 @@ export function TopBar() {
           <div className="relative" ref={popoverRef}>
             <button
               onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-medium transition-all ${
+              className={`flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold transition-all shadow-sm ${
                 agentOnline
-                  ? "border-emerald-500/40 bg-emerald-950/30 text-emerald-300 hover:bg-emerald-950/50"
-                  : "border-amber-500/40 bg-amber-950/30 text-amber-300 hover:bg-amber-950/50"
+                  ? "border-emerald-500/40 bg-emerald-500/15 text-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300 hover:bg-emerald-500/25"
+                  : "border-amber-500/40 bg-amber-500/15 text-amber-800 dark:bg-amber-950/30 dark:text-amber-300 hover:bg-amber-500/25"
               }`}
             >
               <span className="relative flex h-2 w-2">
-                {agentOnline && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />}
-                <span className={`relative inline-flex h-2 w-2 rounded-full ${agentOnline ? "bg-emerald-400" : "bg-amber-400"}`} />
+                {agentOnline && <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />}
+                <span className={`relative inline-flex h-2 w-2 rounded-full ${agentOnline ? "bg-emerald-600 dark:bg-emerald-400" : "bg-amber-600 dark:bg-amber-400"}`} />
               </span>
               <span className="hidden sm:inline font-mono">
                 {agentOnline ? `EDR: LIVE (${agentDetails?.hostname || "Host"})` : "EDR: OFFLINE"}
@@ -132,15 +132,15 @@ export function TopBar() {
 
             {/* Dropdown Popover */}
             {isPopoverOpen && (
-              <div className="absolute right-0 mt-2 w-80 rounded-xl border border-slate-700 bg-slate-950/95 p-4 shadow-2xl backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 z-50">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="absolute right-0 mt-2 w-80 rounded-2xl border border-[#E2D9CC] dark:border-slate-700 bg-white/95 dark:bg-slate-950/95 p-4 shadow-[0_12px_36px_rgba(40,41,55,0.12)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150 z-50 text-[#282937] dark:text-slate-100">
+                <div className="flex items-center justify-between border-b border-[#E2D9CC] dark:border-slate-800 pb-3">
                   <div className="flex items-center gap-2">
                     <ShieldCheck className="text-sx-blue" size={16} />
-                    <span className="text-xs font-semibold text-slate-100">Host EDR Permissions</span>
+                    <span className="text-xs font-semibold text-slate-800 dark:text-slate-100">Host EDR Permissions</span>
                   </div>
                   <span
-                    className={`rounded px-1.5 py-0.5 text-[9px] font-mono uppercase ${
-                      agentOnline ? "bg-emerald-500/20 text-emerald-300" : "bg-amber-500/20 text-amber-300"
+                    className={`rounded px-1.5 py-0.5 text-[9px] font-mono uppercase font-semibold ${
+                      agentOnline ? "bg-emerald-500/20 text-emerald-800 dark:text-emerald-300" : "bg-amber-500/20 text-amber-800 dark:text-amber-300"
                     }`}
                   >
                     {agentOnline ? "Agent Connected" : "Agent Standby"}
@@ -257,46 +257,46 @@ export function TopBar() {
           {mode === "LIVE" ? (
             <Link
               to="/dashboard"
-              className="hidden items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-[11px] font-mono font-medium text-emerald-400 sm:flex transition-colors hover:bg-emerald-500/20"
+              className="hidden items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/15 dark:bg-emerald-500/10 px-3 py-1 text-[11px] font-mono font-semibold text-emerald-800 dark:text-emerald-400 sm:flex transition-colors hover:bg-emerald-500/25 shadow-sm"
             >
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600 dark:bg-emerald-500" />
               </span>
               ONLINE // LIVE
             </Link>
           ) : isStreaming ? (
             <Link
               to="/dashboard"
-              className="hidden items-center gap-1.5 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-3 py-1 text-[11px] font-mono font-medium text-cyan-300 sm:flex transition-colors hover:bg-cyan-500/20"
+              className="hidden items-center gap-1.5 rounded-full border border-sky-500/40 bg-sky-500/15 dark:bg-cyan-500/10 px-3 py-1 text-[11px] font-mono font-semibold text-sky-800 dark:text-cyan-300 sm:flex transition-colors hover:bg-sky-500/25 shadow-sm"
             >
               <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-cyan-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-cyan-400" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-sky-500 dark:bg-cyan-400" />
               </span>
               STREAMING ({streamStatus?.speed_eps} EPS)
             </Link>
           ) : isPaused ? (
             <Link
               to="/dashboard"
-              className="hidden items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-medium text-amber-300 sm:flex transition-colors hover:bg-amber-500/20"
+              className="hidden items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/15 dark:bg-amber-500/10 px-3 py-1 text-[11px] font-mono font-semibold text-amber-800 dark:text-amber-300 sm:flex transition-colors hover:bg-amber-500/25 shadow-sm"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500 dark:bg-amber-400" />
               INGESTION PAUSED
             </Link>
           ) : (
             <Link
               to="/dashboard"
-              className="hidden items-center gap-1.5 rounded-full border border-slate-700/60 bg-slate-800/40 px-2.5 py-1 text-[11px] font-medium text-slate-400 sm:flex transition-colors hover:border-slate-600 hover:text-slate-300"
+              className="hidden items-center gap-1.5 rounded-full border border-[#E2D9CC] dark:border-slate-700/60 bg-white/95 dark:bg-slate-800/40 px-3 py-1 text-[11px] font-semibold text-[#4A4B5E] dark:text-slate-400 sm:flex transition-colors hover:border-[#FA8775]/50 hover:text-[#282937] dark:hover:text-slate-300 shadow-sm"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-slate-500" />
+              <span className="h-1.5 w-1.5 rounded-full bg-[#FA8775] dark:bg-slate-500" />
               OFFLINE MODE
             </Link>
           )}
 
           <button
             aria-label="Notifications"
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue"
           >
             <Bell size={18} />
           </button>
@@ -304,21 +304,21 @@ export function TopBar() {
           <button
             aria-label="Toggle theme"
             onClick={toggleTheme}
-            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sx-blue"
           >
             {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
           </button>
 
           {user && (
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-700/60">
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-300 dark:border-slate-700/60">
               <div className="text-right hidden sm:block">
-                <div className="text-xs font-medium text-slate-200">{user.full_name}</div>
+                <div className="text-xs font-medium text-slate-800 dark:text-slate-200">{user.full_name}</div>
                 <div className="text-[10px] text-slate-500 capitalize">{user.role?.replace("_", " ")}</div>
               </div>
               <button
                 aria-label="Log out"
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-300 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
               >
                 <LogOut size={16} />
               </button>

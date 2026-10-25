@@ -64,29 +64,29 @@ const DARK_PALETTE = {
 };
 
 const LIGHT_PALETTE = {
-  pageBg: "#FAF9FF",
-  gradientOverlay: "linear-gradient(180deg,#FDFCFF 0%,#FAF9FF 55%,#F5F3FF 100%)",
-  blob1: "rgba(124,58,237,0.10)",
-  blob2: "rgba(167,139,250,0.12)",
-  blob3: "rgba(196,181,253,0.20)",
-  radarColor: "#7C3AED",
-  radarOpacity: 0.07,
-  text: "#18181B",
-  textSecondary: "#71717A",
-  textMuted: "#A1A1AA",
+  pageBg: "#FFF5E6",
+  gradientOverlay: "linear-gradient(180deg,#FEFBF4 0%,#FFF5E6 55%,#FDF3E3 100%)",
+  blob1: "rgba(250,135,117,0.22)",
+  blob2: "rgba(157,133,242,0.18)",
+  blob3: "rgba(85,117,112,0.14)",
+  radarColor: "#FA8775",
+  radarOpacity: 0.08,
+  text: "#282937",
+  textSecondary: "#4A4B5E",
+  textMuted: "#58565E",
   surface: "#FFFFFF",
-  surfaceHover: "#FCFAFF",
-  border: "#E9E7F2",
-  primary: "#7C3AED",
-  primaryGlow: "#A78BFA",
-  onPrimary: "#FFFFFF",
-  fieldBg: "rgba(124,58,237,0.03)",
-  headerBg: "rgba(124,58,237,0.04)",
-  chipBg: "rgba(124,58,237,0.08)",
-  errorBg: "rgba(244,63,94,0.08)",
-  errorBorder: "rgba(244,63,94,0.30)",
-  errorText: "#E11D48",
-  successText: "#16A34A",
+  surfaceHover: "#FEFBF4",
+  border: "#E2D9CC",
+  primary: "#282937",
+  primaryGlow: "#FA8775",
+  onPrimary: "#FFF5E6",
+  fieldBg: "#F8F4EC",
+  headerBg: "#FFFFFF",
+  chipBg: "#FED3C6",
+  errorBg: "rgba(190,18,60,0.10)",
+  errorBorder: "rgba(190,18,60,0.30)",
+  errorText: "#BE123C",
+  successText: "#15803D",
 };
 
 type Palette = typeof DARK_PALETTE;
@@ -500,11 +500,11 @@ Please provide:
                 <select
                   value={timeRange}
                   onChange={(e) => setTimeRange(e.target.value)}
-                  className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors"
+                  className="flex-1 rounded-xl px-3 py-2.5 text-sm outline-none transition-colors cursor-pointer"
                   style={{ backgroundColor: palette.fieldBg, border: `1px solid ${palette.border}`, color: palette.text }}
                 >
                   {TIME_RANGES.map((r) => (
-                    <option key={r.value} value={r.value}>{r.label}</option>
+                    <option key={r.value} value={r.value} className="bg-[#0b111e] text-slate-200">{r.label}</option>
                   ))}
                 </select>
                 <button

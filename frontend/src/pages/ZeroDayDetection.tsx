@@ -59,30 +59,30 @@ const DARK_PALETTE = {
 };
 
 const LIGHT_PALETTE = {
-  pageBg: "#FAF9FF",
-  gradientOverlay: "linear-gradient(180deg,#FDFCFF 0%,#FAF9FF 55%,#F5F3FF 100%)",
-  blob1: "rgba(124,58,237,0.10)",
-  blob2: "rgba(167,139,250,0.12)",
-  blob3: "rgba(196,181,253,0.20)",
-  radarColor: "#7C3AED",
-  radarOpacity: 0.07,
-  text: "#18181B",
-  textSecondary: "#71717A",
-  textMuted: "#A1A1AA",
+  pageBg: "#FFF5E6",
+  gradientOverlay: "linear-gradient(180deg,#FEFBF4 0%,#FFF5E6 55%,#FDF3E3 100%)",
+  blob1: "rgba(250,135,117,0.22)",
+  blob2: "rgba(157,133,242,0.18)",
+  blob3: "rgba(85,117,112,0.14)",
+  radarColor: "#FA8775",
+  radarOpacity: 0.08,
+  text: "#282937",
+  textSecondary: "#4A4B5E",
+  textMuted: "#58565E",
   surface: "#FFFFFF",
-  surfaceHover: "#FCFAFF",
-  border: "#E9E7F2",
-  borderHover: "rgba(124,58,237,0.35)",
-  primary: "#7C3AED",
-  primaryGlow: "#A78BFA",
-  onPrimary: "#FFFFFF",
-  hairline: "rgba(124,58,237,0.14)",
-  shadowGlow: "rgba(124,58,237,0.18)",
-  panelShadow: "rgba(124,58,237,0.12)",
-  errorBg: "rgba(244,63,94,0.08)",
-  errorBorder: "rgba(244,63,94,0.30)",
-  errorText: "#E11D48",
-  successText: "#16A34A",
+  surfaceHover: "#FEFBF4",
+  border: "#E2D9CC",
+  borderHover: "rgba(250,135,117,0.50)",
+  primary: "#282937",
+  primaryGlow: "#FA8775",
+  onPrimary: "#FFF5E6",
+  hairline: "rgba(40,41,55,0.08)",
+  shadowGlow: "rgba(250,135,117,0.22)",
+  panelShadow: "rgba(40,41,55,0.08)",
+  errorBg: "rgba(190,18,60,0.10)",
+  errorBorder: "rgba(190,18,60,0.30)",
+  errorText: "#BE123C",
+  successText: "#15803D",
 };
 
 type Palette = typeof DARK_PALETTE;
@@ -864,9 +864,9 @@ export function ZeroDayDetection() {
                           className="rounded-xl border py-1.5 pl-7 pr-8 text-xs outline-none transition-colors appearance-none cursor-pointer"
                           style={{ borderColor: palette.border, backgroundColor: palette.surfaceHover, color: palette.text }}
                         >
-                          <option value="all">All Users ({uniqueUsers.length})</option>
+                          <option value="all" className="bg-[#0b111e] text-slate-200">All Users ({uniqueUsers.length})</option>
                           {uniqueUsers.map((u) => (
-                            <option key={u} value={u}>{u}</option>
+                            <option key={u} value={u} className="bg-[#0b111e] text-slate-200">{u}</option>
                           ))}
                         </select>
                         <ChevronDown size={12} className="pointer-events-none absolute right-2.5" style={{ color: palette.textMuted }} />
@@ -881,10 +881,10 @@ export function ZeroDayDetection() {
                           className="rounded-xl border py-1.5 pl-7 pr-8 text-xs outline-none transition-colors appearance-none cursor-pointer"
                           style={{ borderColor: palette.border, backgroundColor: palette.surfaceHover, color: palette.text }}
                         >
-                          <option value="all">All Splits / Attacks</option>
-                          <option value="standard_split">Standard Random Split</option>
+                          <option value="all" className="bg-[#0b111e] text-slate-200">All Splits / Attacks</option>
+                          <option value="standard_split" className="bg-[#0b111e] text-slate-200">Standard Random Split</option>
                           {uniqueHeldOuts.map((h) => (
-                            <option key={h} value={h}>Held-out: {h}</option>
+                            <option key={h} value={h} className="bg-[#0b111e] text-slate-200">Held-out: {h}</option>
                           ))}
                         </select>
                         <ChevronDown size={12} className="pointer-events-none absolute right-2.5" style={{ color: palette.textMuted }} />

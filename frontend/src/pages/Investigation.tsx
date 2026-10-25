@@ -106,26 +106,26 @@ export function Investigation() {
       </div>
 
       {/* Standalone SOAR Active Response Console */}
-      <div className="glass-panel mb-6 border-red-500/20 bg-red-950/10 p-5">
+      <div className="rounded-2xl mb-6 border border-red-300 dark:border-red-500/20 bg-red-50/40 dark:bg-red-950/10 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)]">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="flex h-2.5 w-2.5 rounded-full bg-red-500 animate-pulse" />
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-red-400">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-red-600 dark:text-red-400">
               SOAR Active Response (Host Containment Console)
             </h2>
           </div>
-          <span className="text-[11px] text-slate-400">Targeting Live Connected Host Agents</span>
+          <span className="text-[11px] text-[#58565e] dark:text-slate-400">Targeting Live Connected Host Agents</span>
         </div>
 
         <form onSubmit={handleExecuteManualSoar} className="flex flex-col gap-3 sm:flex-row">
           <select
             value={manualAction}
             onChange={(e) => setManualAction(e.target.value)}
-            className="rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs font-medium text-slate-200 outline-none focus:border-red-500"
+            className="rounded-xl border border-[#e2d9cc] dark:border-slate-700/80 bg-white dark:bg-[#0b111e] px-3.5 py-2 text-xs font-semibold text-[#282937] dark:text-slate-200 outline-none focus:border-red-500 cursor-pointer shadow-xs"
           >
-            <option value="block_ip">🛡️ Block IP (Firewall)</option>
-            <option value="kill_process">🛑 Kill Process (Host Taskkill)</option>
-            <option value="unblock_ip">🔓 Unblock IP (Remove Firewall Rule)</option>
+            <option value="block_ip" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">🛡️ Block IP (Firewall)</option>
+            <option value="kill_process" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">🛑 Kill Process (Host Taskkill)</option>
+            <option value="unblock_ip" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">🔓 Unblock IP (Remove Firewall Rule)</option>
           </select>
 
           <input
@@ -133,32 +133,32 @@ export function Investigation() {
             placeholder={manualAction === "kill_process" ? "Process Name or PID (e.g., notepad.exe)" : "Target IP Address (e.g., 198.51.100.25)"}
             value={manualTarget}
             onChange={(e) => setManualTarget(e.target.value)}
-            className="flex-1 rounded-lg border border-slate-700 bg-black/40 px-3 py-2 text-xs text-slate-100 placeholder-slate-500 outline-none focus:border-red-500"
+            className="flex-1 rounded-lg border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-black/40 px-3 py-2 text-xs text-[#282937] dark:text-slate-100 placeholder-[#6e7085] dark:placeholder-slate-500 outline-none focus:border-red-500 shadow-xs"
           />
 
           <button
             type="submit"
             disabled={manualExecuting}
-            className="rounded-lg bg-red-600 px-5 py-2 text-xs font-semibold text-white shadow-lg shadow-red-600/20 hover:bg-red-500 disabled:opacity-50 transition-colors"
+            className="rounded-lg bg-red-600 px-5 py-2 text-xs font-semibold text-white shadow-md hover:bg-red-500 disabled:opacity-50 transition-colors cursor-pointer"
           >
             {manualExecuting ? "Dispatching..." : "Execute on Host Agent"}
           </button>
         </form>
 
         {/* Quick presets for rapid testing */}
-        <div className="mt-3 flex items-center gap-2 text-[11px] text-slate-400">
-          <span>Quick Test Presets:</span>
+        <div className="mt-3 flex items-center gap-2 text-[11px] text-[#58565e] dark:text-slate-400 flex-wrap">
+          <span className="font-semibold text-[#282937] dark:text-slate-300">Quick Test Presets:</span>
           <button
             type="button"
             onClick={() => { setManualAction("block_ip"); setManualTarget("198.51.100.25"); }}
-            className="rounded bg-slate-800/80 px-2 py-0.5 text-slate-300 hover:bg-slate-700"
+            className="rounded-lg bg-white dark:bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-[#282937] dark:text-slate-300 border border-[#e2d9cc] dark:border-transparent hover:border-[#fa8775] hover:bg-[#fefbf4] dark:hover:bg-slate-700 shadow-xs transition-colors cursor-pointer"
           >
             Test IP: 198.51.100.25
           </button>
           <button
             type="button"
             onClick={() => { setManualAction("kill_process"); setManualTarget("notepad.exe"); }}
-            className="rounded bg-slate-800/80 px-2 py-0.5 text-slate-300 hover:bg-slate-700"
+            className="rounded-lg bg-white dark:bg-slate-800/80 px-2.5 py-1 text-xs font-semibold text-[#282937] dark:text-slate-300 border border-[#e2d9cc] dark:border-transparent hover:border-[#fa8775] hover:bg-[#fefbf4] dark:hover:bg-slate-700 shadow-xs transition-colors cursor-pointer"
           >
             Test Process: notepad.exe
           </button>

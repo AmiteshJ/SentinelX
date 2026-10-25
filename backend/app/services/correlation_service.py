@@ -317,13 +317,55 @@ async def build_global_correlation_graph(db: AsyncSession, limit: int = 15) -> D
                     add_node(m_id, label=tech, n_type="mitre")
                     add_edge(a_id, m_id, "MAPS_TO", "Tactic")
 
-    # Compute cluster connectivity
+    # If incidents had no alerts or no incidents found, correlate recent alerts directly from Mongo
+    if len(nodes) == 0:
+        cursor = mongo_db.alerts.find().sort("created_at", -1).limit(35)
+        async for alert in cursor:
+            a_id = f"alert:{alert['_id']}"
+            sev = alert.get("severity", "medium")
+            add_node(
+                a_id,
+                label=alert.get("rule_name", "Alert")[:24],
+                n_type="alert",
+                metadata={"severity": sev, "created_at": alert.get("created_at")}
+            )
+
+            src_ip = alert.get("source_ip")
+            if src_ip:
+                s_id = f"ip:{src_ip}"
+                add_node(s_id, label=src_ip, n_type="ip", metadata={"role": "source"})
+                add_edge(s_id, a_id, "TRIGGERED", "Source")
+
+            dst_ip = alert.get("destination_ip")
+            if dst_ip:
+                d_id = f"ip:{dst_ip}"
+                add_node(d_id, label=dst_ip, n_type="ip", metadata={"role": "dest"})
+                add_edge(a_id, d_id, "TARGETS", "Dest")
+
+            tech = alert.get("mitre_technique")
+            if tech:
+                m_id = f"mitre:{tech}"
+                add_node(m_id, label=tech, n_type="mitre")
+                add_edge(a_id, m_id, "MAPS_TO", "Tactic")
+
+    # Compute node degrees & choke points
+    degree_map: Dict[str, int] = {}
+    for e in edges:
+        degree_map[e["source"]] = degree_map.get(e["source"], 0) + 1
+        degree_map[e["target"]] = degree_map.get(e["target"], 0) + 1
+
+    for n in nodes:
+        n["degree"] = degree_map.get(n["id"], 0)
+
+    choke_points = sorted([n for n in nodes if n["type"] in ("ip", "process", "alert")], key=lambda x: x["degree"], reverse=True)[:5]
+
     return {
         "nodes": nodes,
         "edges": edges,
         "summary": {
             "total_incidents": len(incidents),
             "total_nodes": len(nodes),
-            "total_edges": len(edges)
+            "total_edges": len(edges),
+            "choke_points": [{"id": c["id"], "label": c["label"], "type": c["type"], "degree": c["degree"]} for c in choke_points]
         }
     }

@@ -77,7 +77,7 @@ function formatInline(text: string): ReactNode[] {
       return (
         <code
           key={`code-${pIdx}`}
-          className="rounded-md border border-cyan-500/25 bg-cyan-950/40 px-1.5 py-0.5 font-mono text-[11px] font-medium text-cyan-300"
+          className="rounded-md border border-[#e2d9cc] dark:border-cyan-500/25 bg-[#f8f4ec] dark:bg-cyan-950/40 px-1.5 py-0.5 font-mono text-[11px] font-medium text-cyan-800 dark:text-cyan-300"
         >
           {code}
         </code>
@@ -92,7 +92,7 @@ function formatInline(text: string): ReactNode[] {
           if (bPart.startsWith("**") && bPart.endsWith("**")) {
             const boldText = bPart.slice(2, -2);
             return (
-              <strong key={`b-${bIdx}`} className="font-semibold text-slate-100">
+              <strong key={`b-${bIdx}`} className="font-semibold text-[#282937] dark:text-slate-100">
                 {boldText}
               </strong>
             );
@@ -114,22 +114,22 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
   };
 
   return (
-    <div className="my-3 overflow-hidden rounded-xl border border-white/10 bg-[#070d18] shadow-lg">
-      <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-mono">
-        <span className="flex items-center gap-1.5 text-slate-400">
-          <Terminal size={12} className="text-cyan-400" />
+    <div className="my-3 overflow-hidden rounded-xl border border-[#e2d9cc] dark:border-white/10 bg-[#fefbf4] dark:bg-[#070d18] shadow-xs dark:shadow-lg">
+      <div className="flex items-center justify-between border-b border-[#e2d9cc] dark:border-white/10 bg-[#f8f4ec] dark:bg-white/[0.03] px-3.5 py-1.5 text-[11px] font-mono">
+        <span className="flex items-center gap-1.5 text-[#58565e] dark:text-slate-400">
+          <Terminal size={12} className="text-cyan-600 dark:text-cyan-400" />
           {language || "code"}
         </span>
         <button
           type="button"
           onClick={handleCopy}
-          className="flex items-center gap-1 text-[11px] text-slate-400 hover:text-white transition-colors cursor-pointer"
+          className="flex items-center gap-1 text-[11px] text-[#58565e] hover:text-[#282937] dark:text-slate-400 dark:hover:text-white transition-colors cursor-pointer"
         >
-          {copied ? <Check size={12} className="text-emerald-400" /> : <Copy size={12} />}
+          {copied ? <Check size={12} className="text-emerald-600 dark:text-emerald-400" /> : <Copy size={12} />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>
-      <div className="overflow-x-auto p-3 text-xs leading-relaxed text-emerald-400 font-mono">
+      <div className="overflow-x-auto p-3 text-xs leading-relaxed text-[#282937] dark:text-emerald-400 font-mono">
         <pre>{code}</pre>
       </div>
     </div>
@@ -528,7 +528,7 @@ export function AiAssistant() {
   return (
     <>
       {/* Ambient background matching SentinelX Dark Theme */}
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#040810]">
+      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#040810] hidden dark:block">
         <div className="absolute inset-0 bg-gradient-to-b from-[#050b18] via-[#040810] to-[#020509]" />
         <div className="absolute top-1/4 -left-40 h-[520px] w-[520px] rounded-full bg-cyan-600/[0.08] blur-[150px]" />
         <div className="absolute -top-40 right-1/4 h-[560px] w-[560px] rounded-full bg-indigo-600/[0.07] blur-[160px]" />
@@ -536,7 +536,7 @@ export function AiAssistant() {
 
       <DashboardShell>
         {/* FULL VIEW CONTAINER (Edge-to-edge full width & height) */}
-        <div className="w-full h-[calc(100vh-100px)] flex flex-row overflow-hidden rounded-3xl border border-white/10 bg-[#040812]/90 backdrop-blur-2xl shadow-[0_30px_70px_rgba(0,0,0,0.7)]">
+        <div className="w-full h-[calc(100vh-100px)] flex flex-row overflow-hidden rounded-3xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-[#040812]/90 backdrop-blur-2xl shadow-[0_12px_36px_rgba(40,41,55,0.08)] dark:shadow-[0_30px_70px_rgba(0,0,0,0.7)]">
           {/* ============================================================ */}
           {/* SIDEBAR: CHAT HISTORY (ChatGPT STYLE) */}
           {/* ============================================================ */}
@@ -547,16 +547,16 @@ export function AiAssistant() {
                 animate={{ width: 280, opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
-                className="relative z-20 flex h-full shrink-0 flex-col border-r border-white/10 bg-black/40 overflow-hidden"
+                className="relative z-20 flex h-full shrink-0 flex-col border-r border-[#e2d9cc] dark:border-white/10 bg-[#fbf9f4] dark:bg-black/40 overflow-hidden text-[#282937] dark:text-slate-200"
               >
                 {/* Sidebar Header & New Chat Button */}
-                <div className="p-3.5 border-b border-white/10 flex flex-col gap-2.5">
+                <div className="p-3.5 border-b border-[#e2d9cc] dark:border-white/10 flex flex-col gap-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400">
+                      <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-600 dark:text-cyan-400">
                         <Bot size={15} />
                       </div>
-                      <span className="text-xs font-bold text-white tracking-wide uppercase font-mono">
+                      <span className="text-xs font-bold text-[#282937] dark:text-white tracking-wide uppercase font-mono">
                         Chat History
                       </span>
                     </div>
@@ -564,7 +564,7 @@ export function AiAssistant() {
                     <button
                       type="button"
                       onClick={() => setSidebarOpen(false)}
-                      className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                      className="flex h-7 w-7 items-center justify-center rounded-lg text-[#58565e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                       title="Collapse Sidebar"
                     >
                       <PanelLeftClose size={15} />
@@ -575,16 +575,16 @@ export function AiAssistant() {
                   <button
                     type="button"
                     onClick={handleCreateNewChat}
-                    className="flex w-full items-center justify-center gap-2 rounded-full border border-cyan-500/35 bg-gradient-to-r from-cyan-500/20 via-sky-500/20 to-blue-500/20 py-2.5 px-4 text-xs font-semibold text-cyan-200 hover:text-white hover:from-cyan-500/30 hover:to-blue-500/30 transition-all shadow-sm cursor-pointer"
+                    className="flex w-full items-center justify-center gap-2 rounded-full border border-cyan-600/30 dark:border-cyan-500/35 bg-cyan-500/10 dark:bg-gradient-to-r dark:from-cyan-500/20 dark:via-sky-500/20 dark:to-blue-500/20 py-2.5 px-4 text-xs font-semibold text-cyan-800 dark:text-cyan-200 hover:bg-cyan-500/20 dark:hover:text-white transition-all shadow-xs cursor-pointer"
                   >
-                    <Plus size={15} className="text-cyan-400" />
+                    <Plus size={15} className="text-cyan-600 dark:text-cyan-400" />
                     <span>New Investigation</span>
                   </button>
                 </div>
 
                 {/* Saved Chats Scrollable List */}
                 <div className="flex-1 overflow-y-auto p-2.5 space-y-1">
-                  <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-slate-400">
+                  <div className="px-2 py-1 text-[10px] font-mono font-bold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
                     Investigations ({sessions.length})
                   </div>
 
@@ -596,23 +596,23 @@ export function AiAssistant() {
                         onClick={() => setActiveSessionId(s.id)}
                         className={`group relative flex items-center justify-between rounded-2xl px-3 py-2.5 text-xs transition-all cursor-pointer ${
                           isActive
-                            ? "bg-white/[0.09] text-white border border-cyan-500/35 shadow-[0_0_15px_rgba(6,182,212,0.1)] font-medium"
-                            : "text-slate-400 hover:bg-white/[0.04] hover:text-slate-200"
+                            ? "bg-white dark:bg-white/[0.09] text-[#282937] dark:text-white border border-cyan-500/50 shadow-xs font-medium"
+                            : "text-[#58565e] dark:text-slate-400 hover:bg-black/5 dark:hover:bg-white/[0.04] hover:text-[#282937] dark:hover:text-slate-200"
                         }`}
                       >
                         {/* Active indicator bar */}
                         {isActive && (
-                          <div className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-cyan-400" />
+                          <div className="absolute left-0 top-2.5 bottom-2.5 w-1 rounded-r-full bg-cyan-500" />
                         )}
 
                         <div className="flex items-center gap-2.5 overflow-hidden pr-2">
                           <MessageSquare
                             size={14}
-                            className={`shrink-0 ${isActive ? "text-cyan-400" : "text-slate-500 group-hover:text-slate-400"}`}
+                            className={`shrink-0 ${isActive ? "text-cyan-600 dark:text-cyan-400" : "text-[#888691] dark:text-slate-500 group-hover:text-[#282937] dark:group-hover:text-slate-400"}`}
                           />
                           <div className="truncate">
                             <span className="block truncate text-xs leading-tight">{s.title}</span>
-                            <span className="block text-[10px] text-slate-400 font-mono mt-0.5">
+                            <span className="block text-[10px] text-[#58565e] dark:text-slate-400 font-mono mt-0.5">
                               {s.messages.length} messages • {new Date(s.updatedAt).toLocaleDateString([], { month: "short", day: "numeric" })}
                             </span>
                           </div>
@@ -622,7 +622,7 @@ export function AiAssistant() {
                         <button
                           type="button"
                           onClick={(e) => handleDeleteSession(e, s.id)}
-                          className="opacity-0 group-hover:opacity-100 flex h-6 w-6 items-center justify-center rounded-full text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-all shrink-0 cursor-pointer"
+                          className="opacity-0 group-hover:opacity-100 flex h-6 w-6 items-center justify-center rounded-full text-slate-400 hover:text-rose-600 hover:bg-rose-500/10 transition-all shrink-0 cursor-pointer"
                           title="Delete chat"
                         >
                           <Trash2 size={13} />
@@ -633,12 +633,12 @@ export function AiAssistant() {
                 </div>
 
                 {/* Sidebar Footer */}
-                <div className="p-3 border-t border-white/10 bg-black/50 flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <div className="p-3 border-t border-[#e2d9cc] dark:border-white/10 bg-[#f5efe4] dark:bg-black/50 flex items-center justify-between text-[11px] font-mono text-[#58565e] dark:text-slate-400">
                   <span>Preserved locally</span>
                   <button
                     type="button"
                     onClick={handleClearAllSessions}
-                    className="hover:text-rose-400 transition-colors text-[10px]"
+                    className="hover:text-rose-600 transition-colors text-[10px]"
                   >
                     Clear All
                   </button>
@@ -652,14 +652,14 @@ export function AiAssistant() {
           {/* ============================================================ */}
           <div className="relative flex flex-1 flex-col overflow-hidden">
             {/* Top Bar inside Workspace */}
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-black/30 px-6 py-3 backdrop-blur-xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e2d9cc] dark:border-white/10 bg-white/80 dark:bg-black/30 px-6 py-3 backdrop-blur-xl">
               <div className="flex items-center gap-3">
                 {/* Toggle Sidebar Button */}
                 {!sidebarOpen && (
                   <button
                     type="button"
                     onClick={() => setSidebarOpen(true)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-[#e2d9cc] dark:border-white/10 bg-white dark:bg-white/5 text-[#58565e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer shadow-xs"
                     title="Open History Sidebar"
                   >
                     <PanelLeft size={16} />
@@ -668,14 +668,14 @@ export function AiAssistant() {
 
                 <div>
                   <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-bold text-white truncate max-w-xs sm:max-w-md">
+                    <h2 className="text-sm font-bold text-[#282937] dark:text-white truncate max-w-xs sm:max-w-md">
                       {activeSession?.title || "AI SOC Assistant"}
                     </h2>
-                    <span className="rounded-full border border-cyan-500/25 bg-cyan-500/10 px-2.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-cyan-300">
+                    <span className="rounded-full border border-cyan-600/25 dark:border-cyan-500/25 bg-cyan-500/10 px-2.5 py-0.5 text-[9px] font-mono font-bold uppercase tracking-wider text-cyan-800 dark:text-cyan-300">
                       GROQ LLaMA 3.3 70B
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400">
+                  <p className="text-[11px] text-[#58565e] dark:text-slate-400">
                     Grounded in real SOC facts, MITRE vectors, and live network telemetry
                   </p>
                 </div>
@@ -687,18 +687,18 @@ export function AiAssistant() {
                   <select
                     value={activeSession?.incidentId || ""}
                     onChange={(e) => updateActiveIncidentId(e.target.value)}
-                    className="appearance-none rounded-full border border-white/15 bg-white/[0.04] py-1.5 pl-4 pr-8 text-xs text-slate-200 outline-none hover:border-white/25 focus:border-cyan-400/60 max-w-xs truncate shadow-sm"
+                    className="appearance-none rounded-full border border-[#e2d9cc] dark:border-slate-700 bg-white dark:bg-[#0b111e] py-1.5 pl-4 pr-8 text-xs text-[#282937] dark:text-slate-200 outline-none hover:border-[#fa8775] dark:hover:border-slate-600 focus:border-cyan-500 max-w-xs truncate shadow-xs cursor-pointer"
                   >
-                    <option value="">🌐 Global SOC Telemetry Context</option>
+                    <option value="" className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">🌐 Global SOC Telemetry Context</option>
                     {incidents.map((inc) => (
-                      <option key={inc.id} value={inc.id}>
+                      <option key={inc.id} value={inc.id} className="bg-white dark:bg-[#0b111e] text-[#282937] dark:text-slate-200">
                         [{inc.severity.toUpperCase()}] {inc.title || `Incident #${inc.id.slice(-6)}`}
                       </option>
                     ))}
                   </select>
                   <ChevronDown
                     size={13}
-                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[#58565e] dark:text-slate-400"
                   />
                 </div>
               </div>
@@ -709,11 +709,11 @@ export function AiAssistant() {
               {(!activeSession || activeSession.messages.length === 0) ? (
                 /* Empty Welcome Screen */
                 <div className="flex h-full flex-col items-center justify-center text-center my-auto py-8 max-w-4xl mx-auto w-full">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.2)] mb-4">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-3xl border border-cyan-500/30 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 shadow-[0_4px_20px_rgba(6,182,212,0.15)] mb-4">
                     <Bot size={36} />
                   </div>
-                  <h2 className="text-xl font-bold text-white">How can I assist your investigation?</h2>
-                  <p className="max-w-lg text-xs text-slate-400 mt-1 mb-8 leading-relaxed">
+                  <h2 className="text-xl font-bold text-[#282937] dark:text-white">How can I assist your investigation?</h2>
+                  <p className="max-w-lg text-xs text-[#58565e] dark:text-slate-400 mt-1 mb-8 leading-relaxed">
                     Ask questions about active alerts, generate mitigation playbooks, or cross-reference threats against the MITRE ATT&amp;CK matrix.
                   </p>
 
@@ -731,27 +731,27 @@ export function AiAssistant() {
                             setQuestion(p.prompt);
                             inputRef.current?.focus();
                           }}
-                          className="group relative flex items-center justify-between gap-4 sm:gap-5 rounded-[24px] border border-white/10 bg-[#091122]/75 hover:bg-[#0c1730]/95 hover:border-cyan-400/40 p-5 sm:p-6 transition-all duration-200 cursor-pointer shadow-lg backdrop-blur-md text-left min-h-[110px]"
+                          className="group relative flex items-center justify-between gap-4 sm:gap-5 rounded-[24px] border border-[#e2d9cc] dark:border-white/10 bg-white dark:bg-[#091122]/75 hover:bg-[#fefbf4] dark:hover:bg-[#0c1730]/95 hover:border-[#fa8775]/50 dark:hover:border-cyan-400/40 p-5 sm:p-6 transition-all duration-200 cursor-pointer shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:shadow-lg backdrop-blur-md text-left min-h-[110px]"
                         >
                           <div className="flex items-center gap-4 sm:gap-4.5 min-w-0 flex-1">
-                            <div className={`flex h-12 w-12 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-2xl border ${p.accent} shadow-md group-hover:scale-105 transition-transform`}>
+                            <div className={`flex h-12 w-12 sm:h-13 sm:w-13 shrink-0 items-center justify-center rounded-2xl border ${p.accent} shadow-sm group-hover:scale-105 transition-transform`}>
                               <Icon size={22} />
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                                <span className="text-sm sm:text-[15px] font-semibold text-white group-hover:text-cyan-300 transition-colors">
+                                <span className="text-sm sm:text-[15px] font-semibold text-[#282937] dark:text-white group-hover:text-[#fa8775] dark:group-hover:text-cyan-300 transition-colors">
                                   {p.title}
                                 </span>
-                                <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[9px] font-mono tracking-wider text-slate-300 uppercase">
+                                <span className="rounded-full border border-[#e2d9cc] dark:border-white/10 bg-[#f8f4ec] dark:bg-white/5 px-2.5 py-0.5 text-[9px] font-mono tracking-wider text-[#58565e] dark:text-slate-300 uppercase">
                                   {p.badge}
                                 </span>
                               </div>
-                              <p className="text-xs sm:text-[13px] text-slate-400 leading-relaxed group-hover:text-slate-300 transition-colors line-clamp-2">
+                              <p className="text-xs sm:text-[13px] text-[#58565e] dark:text-slate-400 leading-relaxed group-hover:text-[#282937] dark:group-hover:text-slate-300 transition-colors line-clamp-2">
                                 {p.desc}
                               </p>
                             </div>
                           </div>
-                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-400 group-hover:border-cyan-400/40 group-hover:bg-cyan-500/10 group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-all">
+                          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#e2d9cc] dark:border-white/10 bg-[#f8f4ec] dark:bg-white/5 text-[#58565e] dark:text-slate-400 group-hover:border-[#fa8775] dark:group-hover:border-cyan-400/40 group-hover:bg-[#fa8775]/10 dark:group-hover:bg-cyan-500/10 group-hover:text-[#fa8775] dark:group-hover:text-cyan-300 group-hover:translate-x-0.5 transition-all">
                             <ArrowRight size={15} />
                           </div>
                         </motion.button>
@@ -769,52 +769,52 @@ export function AiAssistant() {
                     >
                       {/* Assistant Avatar */}
                       {m.role === "assistant" && (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/15 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] mt-0.5">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] mt-0.5">
                           <Bot size={19} />
                         </div>
                       )}
 
                       {/* System / Error Avatar */}
                       {m.role === "system" && (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-rose-500/30 bg-rose-500/15 text-rose-400 mt-0.5">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-rose-500/30 bg-rose-500/15 text-rose-500 dark:text-rose-400 mt-0.5">
                           <AlertCircle size={19} />
                         </div>
                       )}
 
                       {/* Message Bubble (Full width for assistant, comfortably right-aligned for user) */}
                       <div
-                        className={`relative shadow-xl ${
+                        className={`relative shadow-md ${
                           m.role === "user"
-                            ? "max-w-[85%] rounded-3xl rounded-tr-md px-5 py-3.5 bg-gradient-to-r from-sky-600/35 via-blue-600/30 to-indigo-600/35 border border-sky-400/30 text-white"
+                            ? "max-w-[85%] rounded-3xl rounded-tr-md px-5 py-3.5 bg-gradient-to-r from-sky-600 via-blue-600 to-indigo-600 dark:from-sky-600/35 dark:via-blue-600/30 dark:to-indigo-600/35 border border-sky-400/30 text-white shadow-sm"
                             : m.role === "system"
-                            ? "w-full max-w-[96%] rounded-3xl rounded-tl-md p-5 border border-rose-500/30 bg-rose-950/20 text-rose-200"
-                            : "w-full max-w-[97%] rounded-3xl rounded-tl-md p-5 sm:p-6 border border-white/[0.08] bg-white/[0.025] text-slate-200 backdrop-blur-2xl"
+                            ? "w-full max-w-[96%] rounded-3xl rounded-tl-md p-5 border border-rose-300 dark:border-rose-500/30 bg-rose-50/70 dark:bg-rose-950/20 text-rose-800 dark:text-rose-200"
+                            : "w-full max-w-[97%] rounded-3xl rounded-tl-md p-5 sm:p-6 border border-[#e2d9cc] dark:border-white/[0.08] bg-white dark:bg-white/[0.025] text-[#282937] dark:text-slate-200 backdrop-blur-2xl shadow-[0_2px_12px_rgba(40,41,55,0.05)]"
                         }`}
                       >
                         {/* Assistant Header Info Bar */}
                         {m.role === "assistant" && (
-                          <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-3.5 text-[11px]">
+                          <div className="flex items-center justify-between border-b border-[#e2d9cc] dark:border-white/10 pb-3 mb-3.5 text-[11px]">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-slate-200 tracking-wide uppercase text-[10px] font-mono">
+                              <span className="font-bold text-[#282937] dark:text-slate-200 tracking-wide uppercase text-[10px] font-mono">
                                 SentinelX Cyber Copilot
                               </span>
-                              <span className="rounded-full border border-cyan-500/20 bg-cyan-500/10 px-2.5 py-0.5 font-mono text-[9px] font-semibold text-cyan-300">
+                              <span className="rounded-full border border-cyan-600/20 dark:border-cyan-500/20 bg-cyan-500/10 px-2.5 py-0.5 font-mono text-[9px] font-semibold text-cyan-800 dark:text-cyan-300">
                                 {m.provider?.toUpperCase() || "GROQ"}
                               </span>
                             </div>
 
                             <div className="flex items-center gap-2">
-                              <span className="text-[10px] text-slate-400 font-mono">{m.timestamp}</span>
+                              <span className="text-[10px] text-[#58565e] dark:text-slate-400 font-mono">{m.timestamp}</span>
                               <button
                                 type="button"
                                 onClick={() => handleCopyMessage(m.id, m.content)}
-                                className="flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[10px] text-slate-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                                className="flex items-center gap-1 rounded-full border border-[#e2d9cc] dark:border-white/10 bg-[#f8f4ec] dark:bg-white/5 px-2.5 py-0.5 text-[10px] text-[#58565e] dark:text-slate-400 hover:text-[#282937] dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/10 transition-colors cursor-pointer"
                                 title="Copy markdown"
                               >
                                 {copiedMsgId === m.id ? (
                                   <>
-                                    <Check size={11} className="text-emerald-400" />
-                                    <span className="text-emerald-400 font-medium">Copied</span>
+                                    <Check size={11} className="text-emerald-500 dark:text-emerald-400" />
+                                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">Copied</span>
                                   </>
                                 ) : (
                                   <>
@@ -838,7 +838,7 @@ export function AiAssistant() {
 
                         {/* User Timestamp */}
                         {m.role === "user" && (
-                          <div className="mt-1.5 text-right text-[10px] text-slate-300/70 font-mono">
+                          <div className="mt-1.5 text-right text-[10px] text-white/80 font-mono">
                             {m.timestamp}
                           </div>
                         )}
@@ -846,7 +846,7 @@ export function AiAssistant() {
 
                       {/* User Avatar */}
                       {m.role === "user" && (
-                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-sky-400/30 bg-sky-500/20 text-sky-200 mt-0.5">
+                        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-sky-400/40 bg-sky-500 text-white mt-0.5 shadow-sm">
                           <User size={19} />
                         </div>
                       )}
@@ -856,11 +856,11 @@ export function AiAssistant() {
                   {/* Thinking Indicator */}
                   {loading && (
                     <div className="flex items-start gap-3.5">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/15 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] animate-pulse">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-2xl border border-cyan-500/30 bg-cyan-500/15 text-cyan-600 dark:text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.15)] animate-pulse">
                         <Bot size={19} />
                       </div>
-                      <div className="rounded-full border border-cyan-500/30 bg-cyan-950/25 px-5 py-2.5 text-xs text-cyan-200 backdrop-blur-xl flex items-center gap-2.5 shadow-lg">
-                        <Loader2 size={15} className="animate-spin text-cyan-400" />
+                      <div className="rounded-full border border-cyan-500/30 bg-cyan-50 dark:bg-cyan-950/25 px-5 py-2.5 text-xs text-cyan-900 dark:text-cyan-200 backdrop-blur-xl flex items-center gap-2.5 shadow-sm">
+                        <Loader2 size={15} className="animate-spin text-cyan-600 dark:text-cyan-400" />
                         <span className="font-mono text-[11px] tracking-wide">
                           Analyzing incident telemetry &amp; formulating response with Groq LLaMA 3.3...
                         </span>
@@ -880,7 +880,7 @@ export function AiAssistant() {
               <div className="w-full max-w-5xl">
                 <form
                   onSubmit={handleAsk}
-                  className="relative flex items-center rounded-full border border-white/20 bg-[#060c18]/90 backdrop-blur-3xl px-5 py-2 shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_1px_rgba(6,182,212,0.15)] focus-within:border-cyan-400/70 focus-within:shadow-[0_0_25px_rgba(6,182,212,0.3)] transition-all"
+                  className="relative flex items-center rounded-full border border-[#e2d9cc] dark:border-white/20 bg-white/95 dark:bg-[#060c18]/90 backdrop-blur-3xl px-5 py-2 shadow-[0_4px_24px_rgba(40,41,55,0.08)] dark:shadow-[0_15px_35px_rgba(0,0,0,0.8),0_0_20px_1px_rgba(6,182,212,0.15)] focus-within:border-[#fa8775] dark:focus-within:border-cyan-400/70 transition-all"
                 >
                   <textarea
                     ref={inputRef}
@@ -889,21 +889,21 @@ export function AiAssistant() {
                     onKeyDown={handleKeyDown}
                     rows={1}
                     placeholder="Ask SentinelX Copilot (e.g. 'What is the root cause of this alert?' or 'Generate Sigma rule')..."
-                    className="flex-1 resize-none bg-transparent py-1.5 pr-3 text-xs sm:text-sm text-white placeholder:text-slate-400 outline-none max-h-32 leading-relaxed"
+                    className="flex-1 resize-none bg-transparent py-1.5 pr-3 text-xs sm:text-sm text-[#282937] dark:text-white placeholder:text-[#888691] dark:placeholder:text-slate-400 outline-none max-h-32 leading-relaxed"
                   />
 
                   <button
                     type="submit"
                     disabled={loading || !question.trim()}
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 to-sky-400 text-slate-950 hover:scale-105 active:scale-95 transition-all shadow-[0_0_15px_rgba(6,182,212,0.4)] disabled:opacity-30 disabled:hover:scale-100 cursor-pointer"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-[#fa8775] to-[#f76d57] dark:from-cyan-400 dark:to-sky-400 text-white dark:text-slate-950 hover:scale-105 active:scale-95 transition-all shadow-md disabled:opacity-30 disabled:hover:scale-100 cursor-pointer"
                     title="Send message (Enter)"
                   >
                     <Send size={15} />
                   </button>
                 </form>
 
-                <div className="mt-2 text-center text-[10px] font-mono text-slate-500">
-                  Press <kbd className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-slate-400">Enter</kbd> to send, <kbd className="rounded-full border border-white/15 bg-white/5 px-2 py-0.5 text-slate-400">Shift + Enter</kbd> for newline • Zero fabrication policy
+                <div className="mt-2 text-center text-[10px] font-mono text-[#58565e] dark:text-slate-500">
+                  Press <kbd className="rounded-full border border-[#e2d9cc] dark:border-white/15 bg-[#f8f4ec] dark:bg-white/5 px-2 py-0.5 text-[#282937] dark:text-slate-400">Enter</kbd> to send, <kbd className="rounded-full border border-[#e2d9cc] dark:border-white/15 bg-[#f8f4ec] dark:bg-white/5 px-2 py-0.5 text-[#282937] dark:text-slate-400">Shift + Enter</kbd> for newline • Zero fabrication policy
                 </div>
               </div>
             </div>
