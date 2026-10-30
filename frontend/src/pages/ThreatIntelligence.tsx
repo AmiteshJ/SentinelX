@@ -15,9 +15,11 @@ import {
   AlertTriangle,
   Radio,
   X,
+  ArrowRight,
 } from "lucide-react";
 import { DashboardShell } from "../components/layout/DashboardShell";
 import { BentoCard } from "../components/ui/BentoCard";
+import { ExpandableCard } from "../components/ui/ExpandableCard";
 import { apiClient } from "../api/client";
 import type { MaliciousUrl, ThreatIntelOverview } from "../types/api";
 
@@ -288,44 +290,108 @@ export function ThreatIntelligence() {
         {/* Overview Statistics Cards */}
         {overview && (
           <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="glass-panel relative overflow-hidden rounded-2xl border border-[#e2d9cc] dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/40 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:shadow-xl backdrop-blur-xl">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
-                  Tracked Malicious URLs
-                </span>
-                <Globe className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-              </div>
-              <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.malicious_urls}</span>
-                <span className="text-[11px] text-cyan-700 dark:text-cyan-400 font-mono font-medium">In Database</span>
-              </div>
-            </div>
+            <ExpandableCard
+              id="intel-urls"
+              icon={Globe}
+              subtitle="IOC REPOSITORY"
+              title="Tracked Malicious URLs"
+              children={
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
+                      Tracked Malicious URLs
+                    </span>
+                    <Globe className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.malicious_urls}</span>
+                    <span className="text-[11px] text-cyan-700 dark:text-cyan-400 font-mono font-medium">In Database</span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1 text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold">
+                    <span>Inspect feed sources</span> <ArrowRight size={10} />
+                  </div>
+                </div>
+              }
+              content={
+                <div className="space-y-3 text-xs">
+                  <p className="text-sm font-medium">Continuously synchronized with live threat actor command-and-control (C2) domains, phishing endpoints, and drive-by malware delivery paths.</p>
+                  <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                    <div className="font-bold text-cyan-600 dark:text-cyan-400 mb-1.5">Active Enrichment Feeds</div>
+                    <ul className="space-y-1 text-[#4a4b5e] dark:text-slate-400">
+                      <li>• URLhaus Abuse.ch Real-time Threat Stream</li>
+                      <li>• AlienVault Open Threat Exchange (OTX) Pulse Feeds</li>
+                      <li>• SentinelX Heuristic Domain Shannon Entropy Classifier</li>
+                    </ul>
+                  </div>
+                </div>
+              }
+            />
 
-            <div className="glass-panel relative overflow-hidden rounded-2xl border border-[#e2d9cc] dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/40 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:shadow-xl backdrop-blur-xl">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
-                  Active Malicious IPs
-                </span>
-                <Radio className="h-4 w-4 text-sky-600 dark:text-sky-400" />
-              </div>
-              <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.malicious_ips}</span>
-                <span className="text-[11px] text-sky-700 dark:text-sky-400 font-mono font-medium">Blocked Endpoints</span>
-              </div>
-            </div>
+            <ExpandableCard
+              id="intel-ips"
+              icon={Radio}
+              subtitle="PERIMETER DEFENSE"
+              title="Active Malicious IPs"
+              children={
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
+                      Active Malicious IPs
+                    </span>
+                    <Radio className="h-4 w-4 text-sky-600 dark:text-sky-400" />
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.malicious_ips}</span>
+                    <span className="text-[11px] text-sky-700 dark:text-sky-400 font-mono font-medium">Blocked Endpoints</span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1 text-[10px] text-sky-600 dark:text-sky-400 font-semibold">
+                    <span>Inspect IP reputation</span> <ArrowRight size={10} />
+                  </div>
+                </div>
+              }
+              content={
+                <div className="space-y-3 text-xs">
+                  <p className="text-sm font-medium">Known proxy exit nodes, bulletproof hosting subnets, and active scanner IPs targeted by the detection engine.</p>
+                  <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                    <div className="font-bold text-sky-600 dark:text-sky-400 mb-1.5">Automated Firewall Actions</div>
+                    <p className="text-[#4a4b5e] dark:text-slate-400">Inbound packet streams matching these IP addresses are flagged as high/critical severity and can trigger automated host perimeter isolation.</p>
+                  </div>
+                </div>
+              }
+            />
 
-            <div className="glass-panel relative overflow-hidden rounded-2xl border border-[#e2d9cc] dark:border-slate-800/80 bg-white/95 dark:bg-slate-900/40 p-5 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:shadow-xl backdrop-blur-xl">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
-                  Verification Status
-                </span>
-                <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
-              </div>
-              <div className="mt-2 flex items-baseline gap-2">
-                <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.pending_verification}</span>
-                <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-medium">Pending Review</span>
-              </div>
-            </div>
+            <ExpandableCard
+              id="intel-verification"
+              icon={Shield}
+              subtitle="TRIAGE QUEUE"
+              title="Verification Status"
+              children={
+                <div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-semibold uppercase tracking-wider text-[#58565e] dark:text-slate-400">
+                      Verification Status
+                    </span>
+                    <Shield className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-2">
+                    <span className="text-3xl font-black text-[#282937] dark:text-slate-100">{overview.pending_verification}</span>
+                    <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-mono font-medium">Pending Review</span>
+                  </div>
+                  <div className="mt-3 flex items-center gap-1 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                    <span>Inspect verification pipeline</span> <ArrowRight size={10} />
+                  </div>
+                </div>
+              }
+              content={
+                <div className="space-y-3 text-xs">
+                  <p className="text-sm font-medium">IOC candidates undergoing analyst verification or automated sandboxed validation before rule promotion.</p>
+                  <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                    <div className="font-bold text-emerald-600 dark:text-emerald-400 mb-1.5">Quality Assurance Protocol</div>
+                    <p className="text-[#4a4b5e] dark:text-slate-400">To prevent false positives from blocking legitimate cloud infrastructure (e.g. AWS S3 or Cloudflare CDNs), low-confidence indicators require secondary verification.</p>
+                  </div>
+                </div>
+              }
+            />
           </div>
         )}
 

@@ -941,7 +941,8 @@ export function Dashboard() {
                     ["low", data.low_alerts, Info, palette.low, palette.lowBg, palette.lowRing],
                   ] as const
                 ).map(([severity, count, SevIcon, color, bg, ring]) => (
-                  <button
+                  <motion.button
+                    layoutId={`threat-tier-card-${severity}`}
                     key={severity}
                     type="button"
                     onClick={() => setSelectedThreatSeverity(severity)}
@@ -969,7 +970,7 @@ export function Dashboard() {
                         <ArrowRight size={12} />
                       </span>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </Panel>

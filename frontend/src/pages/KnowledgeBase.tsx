@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { DashboardShell } from "../components/layout/DashboardShell";
+import { ExpandableCard } from "../components/ui/ExpandableCard";
 import { knowledgeApi } from "../api/knowledge";
 import type {
   KnowledgeStats,
@@ -343,73 +344,142 @@ export function KnowledgeBase() {
         </AnimatePresence>
 
         {/* Hardware & Vector Engine Telemetry Cards */}
+        {/* Hardware & Vector Engine Telemetry Cards */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Total Indexed Documents</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <FileText size={15} />
-              </span>
-            </div>
-            <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
-              {stats ? stats.total_documents : "--"}
-            </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
-              <span>{stats ? `${stats.total_sources} categories` : "Loading..."}</span>
-            </div>
-          </div>
+          <ExpandableCard
+            id="kb-total-docs"
+            icon={FileText}
+            subtitle="DOCUMENT STORE"
+            title="Total Indexed Documents"
+            children={
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Total Indexed Documents</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                    <FileText size={15} />
+                  </span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
+                  {stats ? stats.total_documents : "--"}
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-blue-500" />
+                  <span>{stats ? `${stats.total_sources} categories` : "Loading..."}</span>
+                </div>
+              </div>
+            }
+            content={
+              <div className="space-y-3 text-xs">
+                <p className="text-sm font-medium">All indexed reference documents, runbooks, and threat intelligence reports currently searchable by the SentinelX RAG system.</p>
+                <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                  <div className="font-bold text-blue-600 dark:text-blue-400 mb-1">Document Chunking Specs</div>
+                  <p className="text-[#4a4b5e] dark:text-slate-400">Documents are automatically cleaned, chunked into 500-token windows with 50-token overlaps, and assigned categorical metadata tags.</p>
+                </div>
+              </div>
+            }
+          />
 
-          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Embeddings</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                <Layers size={15} />
-              </span>
-            </div>
-            <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
-              {stats ? stats.total_chunks : "--"}
-            </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              <span>{stats ? `${stats.vector_dimension}-dimensional vectors` : "384-dim"}</span>
-            </div>
-          </div>
+          <ExpandableCard
+            id="kb-vector-embeddings"
+            icon={Layers}
+            subtitle="EMBEDDINGS"
+            title="Vector Embeddings"
+            children={
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Embeddings</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <Layers size={15} />
+                  </span>
+                </div>
+                <div className="mt-2 text-2xl font-bold text-[#282937] dark:text-slate-100">
+                  {stats ? stats.total_chunks : "--"}
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-indigo-500" />
+                  <span>{stats ? `${stats.vector_dimension}-dimensional vectors` : "384-dim"}</span>
+                </div>
+              </div>
+            }
+            content={
+              <div className="space-y-3 text-xs">
+                <p className="text-sm font-medium">Normalized multi-dimensional embedding space enabling sub-millisecond semantic search across all incident forensic knowledge.</p>
+                <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                  <div className="font-bold text-indigo-600 dark:text-indigo-400 mb-1">Vector Dimensionality</div>
+                  <p className="text-[#4a4b5e] dark:text-slate-400">Vectors are 384-dimensional dense arrays stored in PostgreSQL using the pgvector extension with normalized Euclidean L2 and Cosine distance operators.</p>
+                </div>
+              </div>
+            }
+          />
 
-          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Active Embedding Model</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Cpu size={15} />
-              </span>
-            </div>
-            <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100 truncate" title={stats?.embedding_model}>
-              {stats ? stats.embedding_model.split(" ")[0] : "all-MiniLM-L6-v2"}
-            </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-              </span>
-              <span>Online &bull; SentenceTransformer</span>
-            </div>
-          </div>
+          <ExpandableCard
+            id="kb-embedding-model"
+            icon={Cpu}
+            subtitle="MODEL RUNTIME"
+            title="Active Embedding Model"
+            children={
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Active Embedding Model</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <Cpu size={15} />
+                  </span>
+                </div>
+                <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100 truncate" title={stats?.embedding_model}>
+                  {stats ? stats.embedding_model.split(" ")[0] : "all-MiniLM-L6-v2"}
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+                  </span>
+                  <span>Online &bull; SentenceTransformer</span>
+                </div>
+              </div>
+            }
+            content={
+              <div className="space-y-3 text-xs">
+                <p className="text-sm font-medium">The deep learning encoder model powering SentinelX's semantic feature extraction.</p>
+                <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                  <div className="font-bold text-emerald-600 dark:text-emerald-400 mb-1">Inference Architecture</div>
+                  <p className="text-[#4a4b5e] dark:text-slate-400">Runs locally on CPU/GPU via PyTorch and sentence-transformers with zero external latency or third-party data egress.</p>
+                </div>
+              </div>
+            }
+          />
 
-          <div className="rounded-2xl border border-[#e2d9cc] dark:border-white/10 bg-white/95 dark:bg-gradient-to-b dark:from-white/[0.04] dark:to-transparent p-4 shadow-[0_2px_12px_rgba(40,41,55,0.06)] dark:backdrop-blur-md">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Store &amp; Index</span>
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <Database size={15} />
-              </span>
-            </div>
-            <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100">
-              PostgreSQL (Neon)
-            </div>
-            <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
-              <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
-              <span>pgvector IVFFlat (Cosine Ops)</span>
-            </div>
-          </div>
+          <ExpandableCard
+            id="kb-vector-store"
+            icon={Database}
+            subtitle="PERSISTENCE ENGINE"
+            title="Vector Store & Index"
+            children={
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-[#58565e] dark:text-slate-400">Vector Store &amp; Index</span>
+                  <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <Database size={15} />
+                  </span>
+                </div>
+                <div className="mt-2 text-sm font-bold text-[#282937] dark:text-slate-100">
+                  PostgreSQL (Neon)
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 text-[11px] text-[#58565e] dark:text-slate-400">
+                  <span className="inline-block h-1.5 w-1.5 rounded-full bg-amber-500" />
+                  <span>pgvector IVFFlat (Cosine Ops)</span>
+                </div>
+              </div>
+            }
+            content={
+              <div className="space-y-3 text-xs">
+                <p className="text-sm font-medium">Native relational and vector database hybrid indexing.</p>
+                <div className="p-3.5 rounded-xl border border-[#e2d9cc] dark:border-slate-800 bg-white/60 dark:bg-slate-900/40">
+                  <div className="font-bold text-amber-600 dark:text-amber-400 mb-1">Index Tuning</div>
+                  <p className="text-[#4a4b5e] dark:text-slate-400">Configured with IVFFlat clustering inverted lists for fast approximate nearest neighbor (ANN) retrieval alongside strict ACID transactional constraints.</p>
+                </div>
+              </div>
+            }
+          />
         </div>
 
         {/* Semantic Search & Vector Retrieval Sandbox */}

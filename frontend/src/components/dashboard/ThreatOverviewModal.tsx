@@ -209,13 +209,14 @@ export function ThreatOverviewModal({
 
           {/* Modal Container */}
           <motion.div
+            layoutId={severity ? `threat-tier-card-${severity}` : undefined}
             role="dialog"
             aria-modal="true"
             aria-label={`${config.label} Breakdown & Justification`}
-            initial={{ opacity: 0, scale: 0.95, y: 16 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 16 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             className="relative z-10 flex max-h-[92vh] w-full max-w-4xl flex-col overflow-hidden rounded-[28px] border border-[#e2d9cc] dark:border-slate-800 bg-white/98 dark:bg-[#060b16]/98 shadow-[0_20px_60px_rgba(40,41,55,0.18)] dark:shadow-[0_40px_120px_-20px_rgba(0,0,0,0.95)]"
           >
             {/* Ambient Background Glow */}

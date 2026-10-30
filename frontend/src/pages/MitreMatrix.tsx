@@ -238,6 +238,7 @@ export function MitreMatrix() {
                         const isSelected = selectedTechId === tech.id;
                         return (
                           <motion.button
+                            layoutId={`mitre-tech-${tech.id}`}
                             key={tech.id}
                             onClick={() => setSelectedTechId(tech.id)}
                             whileHover={{ scale: 1.02 }}
@@ -291,10 +292,11 @@ export function MitreMatrix() {
           {selectedTechId && (
             <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/60 backdrop-blur-sm p-4 sm:p-6">
               <motion.div
-                initial={{ opacity: 0, x: 40 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: 40 }}
-                transition={{ duration: 0.25, ease: "easeOut" }}
+                layoutId={`mitre-tech-${selectedTechId}`}
+                initial={{ opacity: 0, scale: 0.96 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 className="w-full max-w-xl h-full max-h-[90vh] bg-[#0c1322] border border-slate-700/80 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
               >
                 {/* Drawer Header */}
