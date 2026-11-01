@@ -311,14 +311,35 @@ export function TopBar() {
 
           {user && (
             <div className="flex items-center gap-2 pl-2 border-l border-slate-300 dark:border-slate-700/60">
-              <div className="text-right hidden sm:block">
-                <div className="text-xs font-medium text-slate-800 dark:text-slate-200">{user.full_name}</div>
-                <div className="text-[10px] text-slate-500 capitalize">{user.role?.replace("_", " ")}</div>
-              </div>
+              <Link
+                to="/settings"
+                title="View your Analyst Profile & Settings"
+                className="group flex items-center gap-2.5 text-right transition-all hover:opacity-90 cursor-pointer"
+              >
+                <div className="hidden sm:block">
+                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sx-blue transition-colors">
+                    {user.full_name}
+                  </div>
+                  <div className="text-[10px] text-slate-500 capitalize">
+                    {user.role?.replace("_", " ") || "Viewer"}
+                  </div>
+                </div>
+                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sx-blue/15 border border-sx-blue/35 text-sx-blue font-bold text-xs shadow-sm group-hover:border-sx-blue transition-colors overflow-hidden">
+                  {user.avatar_url ? (
+                    <img
+                      src={user.avatar_url}
+                      alt={user.full_name}
+                      className="h-full w-full object-cover rounded-full"
+                    />
+                  ) : (
+                    user.full_name?.charAt(0)?.toUpperCase() || "U"
+                  )}
+                </div>
+              </Link>
               <button
                 aria-label="Log out"
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 dark:text-slate-300 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
               >
                 <LogOut size={16} />
               </button>

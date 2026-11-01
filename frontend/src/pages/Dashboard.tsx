@@ -942,11 +942,12 @@ export function Dashboard() {
                   ] as const
                 ).map(([severity, count, SevIcon, color, bg, ring]) => (
                   <motion.button
-                    layoutId={`threat-tier-card-${severity}`}
                     key={severity}
                     type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                     onClick={() => setSelectedThreatSeverity(severity)}
-                    className="group relative flex items-center justify-between overflow-hidden rounded-2xl border px-4 py-3.5 text-left transition-all duration-200 hover:scale-[1.025] hover:shadow-[0_0_24px_rgba(0,0,0,0.6)] active:scale-[0.98] cursor-pointer"
+                    className="group relative flex items-center justify-between overflow-hidden rounded-2xl border px-4 py-3.5 text-left transition-shadow duration-200 hover:shadow-[0_0_24px_rgba(0,0,0,0.6)] cursor-pointer"
                     style={{ borderColor: ring, background: `linear-gradient(135deg, ${bg} 0%, transparent 70%)` }}
                     title={`Click to view ${severity} threat justification and telemetry breakdown`}
                   >

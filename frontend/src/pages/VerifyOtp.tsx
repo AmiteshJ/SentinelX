@@ -4,6 +4,7 @@ import { Mail, KeyRound, ShieldCheck, CheckCircle2, ArrowRight } from "lucide-re
 import { motion, type Variants } from "framer-motion";
 import { apiClient } from "../api/client";
 import { AuthWallpaper } from "../components/auth/AuthWallpaper";
+import { resolveImageUrl, HERO_BACKGROUND_WALLPAPER } from "./Home";
 
 export function VerifyOtp() {
   const location = useLocation() as { state?: { email?: string } };
@@ -61,13 +62,26 @@ export function VerifyOtp() {
         tagline="Zero-trust authentication ensuring every session is cryptographically bound and tamper-proof."
       />
 
-      {/* Right Form Panel */}
-      <div className="flex w-full flex-col items-center justify-center p-6 sm:p-12 lg:w-1/2">
+      {/* Right Form Panel with Glassmorphism and Blurred Home Wallpaper */}
+      <div className="relative flex w-full flex-col items-center justify-center p-6 sm:p-12 lg:w-1/2 overflow-hidden">
+        {/* Blurred Home Wallpaper Background */}
+        <div className="pointer-events-none absolute inset-0 select-none overflow-hidden">
+          <img
+            src={resolveImageUrl(HERO_BACKGROUND_WALLPAPER)}
+            alt="Atmospheric Background"
+            className="h-full w-full object-cover scale-110 filter blur-2xl opacity-40 brightness-75"
+          />
+          {/* Frosted Glassmorphism Layer Above Wallpaper */}
+          <div className="absolute inset-0 bg-[#070707]/75 backdrop-blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/70" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(58,160,255,0.08)_0%,transparent_65%)]" />
+        </div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-[400px]"
+          className="relative z-10 w-full max-w-[400px]"
         >
           {/* Mobile Header / Brand Logo */}
           <motion.div variants={itemVariants} className="lg:hidden mb-6 flex justify-center">
@@ -127,7 +141,7 @@ export function VerifyOtp() {
                     placeholder="alex@enterprise.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-4 py-3 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                    className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-4 py-3 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                   />
                 </div>
               </motion.div>
@@ -152,7 +166,7 @@ export function VerifyOtp() {
                     placeholder="• • • • • •"
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
-                    className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-4 py-3 text-center tracking-[0.35em] text-lg font-mono text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                    className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-4 py-3 text-center tracking-[0.35em] text-lg font-mono text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                   />
                 </div>
               </motion.div>

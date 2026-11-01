@@ -31,6 +31,19 @@ class Settings(BaseSettings):
     otp_max_attempts: int = 5
     otp_length: int = 6
 
+    # SMTP / Email Delivery
+    smtp_host: str | None = None
+    smtp_port: int = 587
+    smtp_user: str | None = None
+    smtp_password: str | None = None
+    smtp_from_name: str = "SentinelX Security"
+    smtp_from_email: str | None = None
+    smtp_use_tls: bool = True
+
+    # Google OAuth 2.0
+    google_client_id: str | None = None
+    google_client_secret: str | None = None
+
     # AI providers (optional — system must function without them)
     groq_api_key: str | None = None
     ollama_base_url: str | None = None

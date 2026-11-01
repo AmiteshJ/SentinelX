@@ -37,11 +37,24 @@ class RefreshRequest(BaseModel):
     refresh_token: str
 
 
+class GoogleAuthRequest(BaseModel):
+    credential: str | None = None
+    access_token: str | None = None
+
+
 class UserOut(BaseModel):
     id: uuid.UUID
     full_name: str
     email: EmailStr
     role: str | None
     is_verified: bool
+    contact_number: str | None = None
+    avatar_url: str | None = None
 
     model_config = {"from_attributes": True}
+
+
+class ProfileUpdateRequest(BaseModel):
+    full_name: str | None = Field(default=None, min_length=2, max_length=200)
+    contact_number: str | None = Field(default=None, max_length=30)
+    avatar_url: str | None = None

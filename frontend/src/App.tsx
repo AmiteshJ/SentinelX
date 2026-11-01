@@ -23,6 +23,7 @@ import { GraphCorrelation } from "./pages/GraphCorrelation";
 import { ComingSoon } from "./pages/ComingSoon";
 import { MalwareAnalysis } from "./pages/MalwareAnalysis";
 import { useAuthStore } from "./store/authStore";
+import { apiClient } from "./api/client";
 import { FloatingIngestionBubble } from "./components/layout/FloatingIngestionBubble";
 import { PermissionConsentModal } from "./components/permissions/PermissionConsentModal";
 import { startGlobalStreamPolling, stopGlobalStreamPolling } from "./store/streamStore";
@@ -34,14 +35,21 @@ function RequireAuth({ children }: { children: JSX.Element }) {
 
 export default function App() {
   const accessToken = useAuthStore((s) => s.accessToken);
+  const setUser = useAuthStore((s) => s.setUser);
 
   useEffect(() => {
     if (accessToken) {
       startGlobalStreamPolling();
+      apiClient
+        .get("/api/auth/me")
+        .then((res) => {
+          if (res.data) setUser(res.data);
+        })
+        .catch(() => {});
     } else {
       stopGlobalStreamPolling();
     }
-  }, [accessToken]);
+  }, [accessToken, setUser]);
 
   return (
     <ThemeProvider>

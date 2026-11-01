@@ -41,6 +41,8 @@ export interface UserOut {
   email: string;
   role: string | null;
   is_verified: boolean;
+  contact_number?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface Alert {

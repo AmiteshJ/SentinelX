@@ -4,6 +4,8 @@ import { User, Mail, Phone, Lock, Eye, EyeOff, ShieldCheck, ArrowRight } from "l
 import { motion, type Variants } from "framer-motion";
 import { apiClient } from "../api/client";
 import { AuthWallpaper, type WallpaperSlide } from "../components/auth/AuthWallpaper";
+import { resolveImageUrl, HERO_BACKGROUND_WALLPAPER } from "./Home";
+import { useGoogleAuth } from "../hooks/useGoogleAuth";
 
 // Custom Google SVG Icon
 const GoogleIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -53,6 +55,12 @@ export function Register() {
 
   const navigate = useNavigate();
 
+  const {
+    triggerGoogleSignIn,
+    loading: googleLoading,
+    error: googleError,
+  } = useGoogleAuth();
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -96,22 +104,33 @@ export function Register() {
     }
   }
 
-  const handleOAuthClick = (provider: string) => {
-    setError(`${provider} signup is coming soon. Please complete registration with your credentials below.`);
-  };
+
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-[#050505] font-sans text-neutral-200 antialiased selection:bg-white/20 selection:text-white lg:flex-row">
       {/* Left Video Wallpaper Panel */}
       <AuthWallpaper slides={REGISTER_SLIDES} />
 
-      {/* Right Form Panel */}
-      <div className="flex w-full flex-col items-center justify-center p-6 sm:p-10 lg:w-1/2">
+      {/* Right Form Panel with Glassmorphism and Blurred Home Wallpaper */}
+      <div className="relative flex w-full flex-col items-center justify-center p-6 sm:p-10 lg:w-1/2 overflow-hidden">
+        {/* Blurred Home Wallpaper Background */}
+        <div className="pointer-events-none absolute inset-0 select-none overflow-hidden">
+          <img
+            src={resolveImageUrl(HERO_BACKGROUND_WALLPAPER)}
+            alt="Atmospheric Background"
+            className="h-full w-full object-cover scale-110 filter blur-2xl opacity-40 brightness-75"
+          />
+          {/* Frosted Glassmorphism Layer Above Wallpaper */}
+          <div className="absolute inset-0 bg-[#070707]/75 backdrop-blur-3xl" />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-transparent to-[#050505]/70" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(58,160,255,0.08)_0%,transparent_65%)]" />
+        </div>
+
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="w-full max-w-[420px]"
+          className="relative z-10 w-full max-w-[420px]"
         >
           {/* Mobile Header / Brand Logo */}
           <motion.div variants={itemVariants} className="lg:hidden mb-6 flex justify-center">
@@ -138,18 +157,19 @@ export function Register() {
             </p>
           </motion.div>
 
-          {/* Centered Google Button (Apple button removed) */}
+          {/* Centered Google Button */}
           <motion.div
             variants={itemVariants}
             className="mb-5 flex justify-center"
           >
             <button
               type="button"
-              onClick={() => handleOAuthClick("Google")}
-              className="w-full flex items-center justify-center gap-2.5 rounded-full border border-white/10 bg-[#141414] py-2.5 text-[13px] font-medium text-white transition-all hover:bg-[#1f1f1f] hover:border-white/20 active:scale-[0.96] cursor-pointer shadow-sm"
+              onClick={triggerGoogleSignIn}
+              disabled={submitting || googleLoading}
+              className="w-full flex items-center justify-center gap-2.5 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-md py-2.5 text-[13px] font-medium text-white transition-all hover:bg-white/[0.08] hover:border-white/20 active:scale-[0.96] cursor-pointer shadow-sm disabled:opacity-50"
             >
               <GoogleIcon className="text-[17px]" />
-              <span>Continue with Google</span>
+              <span>{googleLoading ? "Connecting with Google..." : "Continue with Google"}</span>
             </button>
           </motion.div>
 
@@ -186,7 +206,7 @@ export function Register() {
                   placeholder="Alex Mercer"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                  className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                 />
               </div>
             </motion.div>
@@ -210,7 +230,7 @@ export function Register() {
                   placeholder="alex@enterprise.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                  className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                 />
               </div>
             </motion.div>
@@ -234,7 +254,7 @@ export function Register() {
                   placeholder="+1 (555) 019-2834"
                   value={contactNumber}
                   onChange={(e) => setContactNumber(e.target.value)}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                  className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-4 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                 />
               </div>
             </motion.div>
@@ -259,7 +279,7 @@ export function Register() {
                   placeholder="Minimum 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-[14px] border border-white/10 bg-[#0A0A0A] pl-10 pr-10 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-neutral-400 focus:bg-[#111] focus:ring-1 focus:ring-neutral-400 focus:outline-none"
+                  className="w-full rounded-[14px] border border-white/10 bg-black/40 backdrop-blur-md pl-10 pr-10 py-2.5 text-sm text-white transition-colors placeholder:text-neutral-500 focus:border-white/30 focus:bg-black/60 focus:ring-1 focus:ring-white/20 focus:outline-none"
                 />
                 <button
                   type="button"
@@ -273,13 +293,13 @@ export function Register() {
             </motion.div>
 
             {/* Error Banner */}
-            {error && (
+            {(googleError || error) && (
               <motion.div
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 className="p-3 rounded-xl bg-red-500/10 border border-red-500/25 text-red-400 text-xs flex items-center gap-2"
               >
-                <span>{error}</span>
+                <span>{googleError || error}</span>
               </motion.div>
             )}
 

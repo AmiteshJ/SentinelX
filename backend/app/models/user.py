@@ -26,6 +26,7 @@ class User(Base):
     full_name: Mapped[str] = mapped_column(String(200), nullable=False)
     email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
     contact_number: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    avatar_url: Mapped[str | None] = mapped_column(String, nullable=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     role_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("roles.id"), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=False)
