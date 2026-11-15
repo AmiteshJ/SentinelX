@@ -117,3 +117,4 @@ research paper/
 dataset/*.csv
 dataset/*.zip
 dataset/*.gz
+*.pdf
